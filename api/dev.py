@@ -5,6 +5,16 @@ import pdb
 
 import random
 
+from models.user import User
+from models.watchlist import Watchlist
+
+
+def watchlists_to_json(watchlists):
+    return [
+        {"id": str(watchlist.id), "name": watchlist.name} for watchlist in watchlists
+    ]
+
+
 watchlists = [
     {
         "name": "Watchlist 1",
@@ -84,43 +94,79 @@ watchlists = [
 # Let user set defaults columns for new watchlists
 columns = []
 
-
+# /watchlists
 class RESTWatchlists(Resource):
     def get(self):
-        response = jsonify(watchlists)
-        return response
+        user = User.objects.first()
+        return watchlists_to_json(user.watchlists)
 
     def post(self):
-        new_watchlist = json.loads(request.form.get("new_watchlist", "null"))
+        new_watchlist = json.loads(request.data)
         if new_watchlist == None:
             raise Exception("No data sent")
 
-        watchlists.append(new_watchlist)
-        return {"status": "success"}
+        user = User.objects.first()
+        watchlist = Watchlist(
+            name=new_watchlist["name"],
+            tickers=new_watchlist["tickers"],
+            columns=new_watchlist["columns"],
+        )
+        user.watchlists.append(watchlist)
+        user.save()
+        return watchlists_to_json(user.watchlists)
 
     def put(self):
-        updated_watchlists = json.loads(request.form.get("updated_watchlists", "null"))
+        updated_watchlists = json.loads(request.data).get("data", None)
         if updated_watchlists == None:
             raise Exception("No data sent")
 
-        while len(watchlists):
-            watchlists.pop()
+        user = User.objects.first()
+        new_watchlists = []
 
-        for watchlist in updated_watchlists:
-            watchlists.append(watchlist)
+        for old_watchlist in user.watchlists:
+            new_watchlist = next(
+                (
+                    item
+                    for item in updated_watchlists
+                    if item["id"] == str(old_watchlist.id)
+                ),
+                None,
+            )
+            if new_watchlist != None:
+                new_watchlists.append(
+                    Watchlist(
+                        name=new_watchlist["name"],
+                        tickers=old_watchlist.tickers,
+                        columns=old_watchlist.columns,
+                        id=old_watchlist.id,
+                        date_created=old_watchlist.date_created,
+                    )
+                )
 
-        return jsonify(updated_watchlists)
+        user.watchlists = new_watchlists
+        user.save()
+
+        return updated_watchlists
 
 
+# /watchlists/<int:watchlist_id>
 class RESTWatchlist(Resource):
     def get(self, watchlist_id):
-        for watchlist in watchlists:
-            if watchlist["id"] == watchlist_id:
-                return watchlist
+        user = User.objects.first()
+        watchlist = list(
+            filter(lambda watchlist: str(watchlist.id) == watchlist_id, user.watchlists)
+        )
+
+        if len(watchlist):
+            return watchlist[0].to_json()
+
         return {"message": "not found"}, 400
 
     def put(self, watchlist_id):
-        new_watchlist_items = json.loads(request.form.get("new_watchlist_items"))
+        new_watchlist_items = json.loads(request.data).get("data", None)
+
+        if new_watchlist_items == None:
+            raise Exception("No data sent")
 
         new_tickers = [
             {
@@ -131,15 +177,21 @@ class RESTWatchlist(Resource):
             for item in new_watchlist_items
         ]
 
-        for watchlist in watchlists:
-            if watchlist["id"] == watchlist_id:
-                watchlist["tickers"] = new_tickers
+        user = User.objects.first()
+        watchlist = list(
+            filter(lambda watchlist: str(watchlist.id) == watchlist_id, user.watchlists)
+        )
 
-                return watchlists
+        if len(watchlist):
+            watchlist[0].tickers = new_tickers
+            user.save()
+
+            return watchlist[0].to_json()
 
         return {"message": "watchlist not found"}, 400
 
 
+# /newcolumndata
 class RESTNewColumnData(Resource):
     def get(self):
         columns = json.loads(request.args.get("columns"))
@@ -169,19 +221,26 @@ class RESTNewColumnData(Resource):
         random.seed(1)
         newWatchlistItems = list(map(func, watchlistItems))
 
-        return jsonify(newWatchlistItems)
+        return newWatchlistItems
 
 
+# /columns/<int:watchlist_id>
 class RESTWatchlistColumns(Resource):
     def put(self, watchlist_id):
-        columns = json.loads(request.form.get("columns", "null"))
+        columns = json.loads(request.data).get("data", None)
 
         if columns == None:
             return {"status": "fail"}, 400
 
-        for watchlist in watchlists:
-            if watchlist["id"] == watchlist_id:
-                watchlist["columns"] = columns
-                return jsonify(watchlists)
+        user = User.objects.first()
+        watchlist = list(
+            filter(lambda watchlist: str(watchlist.id) == watchlist_id, user.watchlists)
+        )
 
-        return {"message": "watchlist not found"}
+        if len(watchlist):
+            watchlist[0].columns = columns
+            user.save()
+
+            return watchlist[0].to_json()
+
+        return {"message": "watchlist not found"}, 400
