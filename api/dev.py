@@ -113,7 +113,7 @@ class RESTWatchlists(Resource):
         )
         user.watchlists.append(watchlist)
         user.save()
-        return watchlists_to_json(user.watchlists)
+        return [watchlists_to_json(user.watchlists), str(watchlist.id)]
 
     def put(self):
         updated_watchlists = json.loads(request.data).get("data", None)
