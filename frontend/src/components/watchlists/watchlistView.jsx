@@ -177,28 +177,23 @@ const WatchlistView = () => {
 
 	useEffect(() => {
 		axios
-			.get("http://127.0.0.1:5000/api/watchlists")
+			.get("/api/watchlists")
 			.then((res) => {
 				const watchlists = res.data;
 				if (watchlists.length) {
 					axios
-						.get(
-							`http://127.0.0.1:5000/api/watchlists/${watchlists[0].id}`
-						)
+						.get(`/api/watchlists/${watchlists[0].id}`)
 						.then((res) => {
 							const watchlist = res.data;
 							const columns = watchlist.columns;
 							const tickers = watchlist.tickers;
 							axios
-								.get(
-									"http://127.0.0.1:5000/api/newcolumndata",
-									{
-										params: {
-											columns: JSON.stringify(columns),
-											tickers: JSON.stringify(tickers),
-										},
-									}
-								)
+								.get("/api/newcolumndata", {
+									params: {
+										columns: JSON.stringify(columns),
+										tickers: JSON.stringify(tickers),
+									},
+								})
 								.then((res) => {
 									setWatchlistID(watchlist.id);
 									setColumns(columns);
