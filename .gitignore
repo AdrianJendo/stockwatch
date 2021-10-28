@@ -1,3 +1,6 @@
+notes.txt
+todo.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -70,7 +73,6 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-todo.md
 
 # PyBuilder
 .pybuilder/
@@ -137,8 +139,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-TODO.md
 
 # testing
 coverage/
