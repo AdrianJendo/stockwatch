@@ -97,6 +97,7 @@ columns = []
 # /watchlists
 class RESTWatchlists(Resource):
     def get(self):
+        return "Hello World"
         user = User.objects.first()
         return watchlists_to_json(user.watchlists)
 

@@ -3,9 +3,26 @@ services:
     frontend:
         build:
             context: ./frontend
-        ports:
-            - "3000:3000"
         volumes:
-            - ./frontend/src:/stockwatch/frontend/src
+            - /frontend/node_modules
+            - ./frontend/src:/frontend/src
         env_file:
             - ./.env
+    backend:
+        build:
+            context: ./backend
+        volumes:
+            - ./backend/api:/backend/api
+            - ./backend/models:/backend/models
+            - ./backend/app.py:/backend/app.py
+        env_file:
+            - ./.env
+    nginx:
+        restart: always
+        depends_on:
+            - frontend
+            - backend
+        build:
+            context: ./nginx
+        ports:
+            - 8080:80

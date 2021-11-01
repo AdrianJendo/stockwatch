@@ -1,7 +1,7 @@
 FROM node:14 as builder
 
 # WORKDIR in docker container
-WORKDIR /stockwatch/frontend
+WORKDIR /frontend
 
 # Docker uses caching so install all the dependencies first
 COPY package.json .
@@ -15,4 +15,6 @@ RUN npm run build
 
 # prepare nginx
 FROM nginx
-COPY --from=builder /stockwatch/frontend/build /usr/share/nginx/html
+EXPOSE 3000
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /frontend/build /usr/share/nginx/html
