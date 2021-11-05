@@ -62,13 +62,13 @@ const WatchlistsPopover = (props) => {
 	const handleSelectWatchlist = (id) => {
 		if (id !== null) {
 			axios
-				.get(`http://127.0.0.1:5000/api/watchlists/${id}`)
+				.get(`/api/watchlists/${id}`)
 				.then((res) => {
 					const watchlist = res.data;
 					const columns = watchlist.columns;
 					const tickers = watchlist.tickers;
 					axios
-						.get("http://127.0.0.1:5000/api/newcolumndata", {
+						.get("/api/newcolumndata", {
 							params: {
 								columns: JSON.stringify(columns),
 								tickers: JSON.stringify(tickers),

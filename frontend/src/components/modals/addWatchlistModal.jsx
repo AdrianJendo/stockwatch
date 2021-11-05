@@ -69,7 +69,7 @@ const AddWatchlistModal = (props) => {
 		}
 
 		axios
-			.post("http://127.0.0.1:5000/api/watchlists", newWatchlist)
+			.post("/api/watchlists", newWatchlist)
 			.then((res) => {
 				const updatedWatchlists = res.data[0];
 				const newWatchlistID = res.data[1];

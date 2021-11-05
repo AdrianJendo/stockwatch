@@ -154,12 +154,12 @@ const SearchTickerModal = (props) => {
 		});
 
 		axios
-			.put(`http://127.0.0.1:5000/api/watchlists/${watchlistID}`, {
+			.put(`/api/watchlists/${watchlistID}`, {
 				data: selectedResults,
 			})
 			.then(() => {
 				axios
-					.get("http://127.0.0.1:5000/api/newcolumndata", {
+					.get("/api/newcolumndata", {
 						params: {
 							columns: JSON.stringify(columns),
 							tickers: JSON.stringify(newItems),

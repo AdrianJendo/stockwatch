@@ -179,17 +179,16 @@ const WatchlistView = () => {
 		axios
 			.get("/api/watchlists")
 			.then((res) => {
-				console.log("Success");
 				const watchlists = res.data;
 				if (watchlists.length) {
 					axios
-						.get(`api/watchlists/${watchlists[0].id}`)
+						.get(`/api/watchlists/${watchlists[0].id}`)
 						.then((res) => {
 							const watchlist = res.data;
 							const columns = watchlist.columns;
 							const tickers = watchlist.tickers;
 							axios
-								.get("api/newcolumndata", {
+								.get("/api/newcolumndata", {
 									params: {
 										columns: JSON.stringify(columns),
 										tickers: JSON.stringify(tickers),
@@ -273,7 +272,7 @@ const WatchlistView = () => {
 		}
 
 		axios
-			.put(`http://127.0.0.1:5000/api/watchlists/${watchlistID}`, {
+			.put(`/api/watchlists/${watchlistID}`, {
 				data: newWatchlistItems,
 			})
 			.then(() => {

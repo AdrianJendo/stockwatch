@@ -118,7 +118,7 @@ const EditWatchlistsModal = (props) => {
 	const handleSave = () => {
 		//Do some kind of alert to show that the list was saved successfully
 		axios
-			.put("http://127.0.0.1:5000/api/watchlists", {
+			.put("/api/watchlists", {
 				data: currentWatchlists,
 			})
 			.then(() => {

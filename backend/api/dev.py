@@ -92,12 +92,10 @@ watchlists = [
 
 
 # Let user set defaults columns for new watchlists
-columns = []
 
 # /watchlists
 class RESTWatchlists(Resource):
     def get(self):
-        return "Hello World"
         user = User.objects.first()
         return watchlists_to_json(user.watchlists)
 
@@ -245,3 +243,25 @@ class RESTWatchlistColumns(Resource):
             return watchlist[0].to_json()
 
         return {"message": "watchlist not found"}, 400
+
+
+class RESTUsers(Resource):
+    def get(self):
+        user = User.objects.first()
+        return jsonify(user)
+
+    def post(self):
+
+        new_user_data = json.loads(request.data)
+
+        if new_user_data == None:
+            raise Exception("No data sent")
+
+        new_user = User(
+            email=new_user_data.get("email"),
+            username=new_user_data.get("username"),
+            password=new_user_data.get("password"),
+        )
+        new_user.save()
+
+        return {"status": "success", "id": str(new_user.id)}

@@ -12,4 +12,4 @@ class User(me.Document):
     is_active = me.BooleanField(default=True)
     is_admin = me.BooleanField(default=False)
     last_login = me.DateTimeField(default=datetime.datetime.utcnow)
-    watchlists = me.ListField(me.EmbeddedDocumentField(Watchlist))
+    watchlists = me.ListField(me.EmbeddedDocumentField(Watchlist), default=[])

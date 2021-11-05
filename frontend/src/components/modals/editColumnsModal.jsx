@@ -262,12 +262,12 @@ const EditColumnsModal = (props) => {
 
 	const handleSave = () => {
 		axios
-			.put(`http://127.0.0.1:5000/api/columns/${watchlistID}`, {
+			.put(`/api/columns/${watchlistID}`, {
 				data: selection,
 			})
 			.then(() =>
 				axios
-					.get("http://127.0.0.1:5000/api/newcolumndata", {
+					.get("/api/newcolumndata", {
 						params: {
 							columns: JSON.stringify(selection),
 							tickers: JSON.stringify(watchlistItems),
