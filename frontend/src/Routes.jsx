@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Header from "components/base/header";
 import Sidebar from "components/base/sidebar";
 import Heatmap from "components/heatmap";
-import Comparisons from "components/comparisons";
+import Comparisons from "components/comparisons/comparisons";
 import WatchlistView from "components//watchlists/watchlistView";
 import TickerView from "components/tickerView";
 import React from "react";
