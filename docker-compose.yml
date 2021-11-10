@@ -21,6 +21,8 @@ services:
             MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin #or mongodb://mongo:27017/stockwatch
         depends_on:
             - mongo
+        stdin_open: true # For pdb
+        tty: true # For pdb i think
     nginx:
         restart: always
         depends_on:

@@ -6,13 +6,13 @@ from dotenv import load_dotenv, find_dotenv
 from flask_cors import CORS
 
 from api import dev
+from api import comparisons
 
 # dotenv
 load_dotenv(find_dotenv())
 
 # App config && DB
 app = Flask(__name__)
-print(os.environ.get("MONGO_URI"), os.environ.get("MONGO_PORT"))  #
 app.config["MONGODB_SETTINGS"] = {
     "host": os.environ.get("MONGO_URI"),
 }
@@ -21,13 +21,18 @@ db = MongoEngine(app)
 api_bp = Blueprint("api", __name__)
 api = Api(api_bp)
 
-
 # Routes
-api.add_resource(dev.RESTUsers, "/users")
+# watchlist
 api.add_resource(dev.RESTWatchlists, "/watchlists")
 api.add_resource(dev.RESTWatchlist, "/watchlists/<watchlist_id>")
 api.add_resource(dev.RESTNewColumnData, "/newcolumndata")
 api.add_resource(dev.RESTWatchlistColumns, "/columns/<watchlist_id>")
+
+# comparisons
+api.add_resource(comparisons.RESTComparisons, "/comparisons")
+
+# users
+api.add_resource(dev.RESTUsers, "/users")
 
 # Register Routes
 app.register_blueprint(api_bp, url_prefix="/api")
