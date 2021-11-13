@@ -185,7 +185,7 @@ const Comparisons = () => {
 			/>
 			<Button
 				className={classes.main}
-				color={tickerText !== "" ? "primary" : ""}
+				color={tickerText !== "" ? "primary" : "inherit"}
 				variant={tickerText !== "" ? "contained" : "outlined"}
 				onClick={addStockToQueue}
 			>
@@ -205,6 +205,7 @@ const Comparisons = () => {
 							onMouseEnter={() => setHoveringOver(index)}
 							onMouseLeave={() => setHoveringOver(-1)}
 							onClick={() => removeStockFromQueue(index)}
+							key={index}
 						>
 							{stock}
 						</Button>
