@@ -19,6 +19,7 @@ class RESTPriceHistory(Resource):
             return "No data"
 
         endDate = date.today()
+        minStartDate = endDate.replace(year=endDate.year - 1)
         if interval == "YTD":
             startDate = date(date.today().year, 1, 1)
         elif interval[len(interval) - 1] == "D":
@@ -41,12 +42,14 @@ class RESTPriceHistory(Resource):
         else:
             return "Correct interval not specified"
 
+        minStartDate = minStartDate.strftime("%Y-%m-%d")
         startDate = startDate.strftime("%Y-%m-%d")
+        queryStartDate = minStartDate if minStartDate < startDate else startDate
         endDate = endDate.strftime("%Y-%m-%d")
 
         price_data = requests.get(
             tiingo_url + "daily/{}/prices".format(ticker),
-            params={"startDate": startDate, "endDate": endDate, "token": api_key},
+            params={"startDate": queryStartDate, "endDate": endDate, "token": api_key},
         ).json()
 
         df = pd.DataFrame(price_data)
@@ -55,34 +58,53 @@ class RESTPriceHistory(Resource):
             lambda x: x[0:10]
         )  # Truncate the dates to get rid of timestamp
         chartData = df[["date", "adjClose"]]
+        chartData = df.loc[df["date"] > startDate]
         chartData = chartData.rename(columns={"date": "time", "adjClose": "value"})
-        df = df[
-            [
-                "date",
-                "adjClose",
-                "divCash",
-                "adjVolume",
-                "splitFactor",
-                "adjHigh",
-                "adjLow",
-            ]
-        ]  # Might be cool to try and point out where the high and low are
+        # df = df[
+        #     [
+        #         "date",
+        #         "adjClose",
+        #         "divCash",
+        #         "adjVolume",
+        #         "splitFactor",
+        #         "adjHigh",
+        #         "adjLow",
+        #     ]
+        # ]
 
         meta_info = requests.get(
             tiingo_url + "daily/{}".format(ticker),
             params={"token": api_key},
         ).json()
 
+        df_1yr = df.loc[df["date"] > minStartDate]
+        df = df.loc[df["date"] > startDate]
         last_price = df["adjClose"].iloc[len(df) - 1]
         first_price = df["adjClose"].iloc[0]
         price_change = last_price - first_price
         percent_change = (price_change) / first_price * 100
 
-        return {
-            "fullData": df.to_json(orient="records"),
-            "priceData": chartData.to_json(orient="records"),
+        today_data = df.iloc[len(df) - 1]
+
+        supplementary_data = {
+            "avg_volume": int(df_1yr["adjVolume"].mean()),
+            "high_price_52": df_1yr["adjHigh"].max(),
+            "low_price_52": df_1yr["adjLow"].min(),
+            "div_yield": df_1yr["divCash"].sum() / last_price * 100,
+            "name": meta_info["name"],
+            "exchangeCode": meta_info["exchangeCode"],
             "percentChange": round(percent_change, 2),
-            "lastPrice": round(last_price, 2),
             "priceChange": round(price_change, 2),
-            "metaInfo": json.dumps(meta_info),
+            "lastPrice": today_data["adjClose"],
+            "openPrice": today_data["adjOpen"],
+            "highPrice": today_data["adjHigh"],
+            "lowPrice": today_data["adjLow"],
+        }
+
+        # pdb.set_trace()
+
+        return {
+            # "fullData": df.to_json(orient="records"),
+            "priceData": chartData.to_json(orient="records"),
+            "supplementary_data": json.dumps(supplementary_data),
         }

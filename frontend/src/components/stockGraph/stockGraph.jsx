@@ -27,6 +27,11 @@ const useStyles = makeStyles(() => ({
 		minHeight: "110px",
 		margin: "20px",
 	},
+	footerDiv: {
+		width: "800px",
+		minHeight: "200px",
+		margin: "20px",
+	},
 }));
 
 const intervals = ["1D", "5D", "1M", "6M", "YTD", "1Y", "5Y", "MAX"];
@@ -47,8 +52,8 @@ const StockGraph = () => {
 	const [selectedInterval, setSelectedInterval] = useState("YTD");
 	const [chart, setChart] = useState(null);
 	const [areaSeries, setAreaSeries] = useState(null);
-	const [stockInfo, setStockInfo] = useState(null);
-	const [priceInfo, setPriceInfo] = useState(null);
+	const [stockInfo, setStockInfo] = useState(null); // For data that doesn't change after first call
+	const [priceInfo, setPriceInfo] = useState(null); // Data that does change after first call
 
 	const changeInterval = (interval) => {
 		setPriceInfo(null);
@@ -66,19 +71,11 @@ const StockGraph = () => {
 			})
 			.then((resp) => {
 				const priceData = JSON.parse(resp.data.priceData);
-				const fullData = JSON.parse(resp.data.fullData);
-				const changePercent = JSON.parse(resp.data.percentChange);
-				const priceChange = JSON.parse(resp.data.priceChange);
-				const lastPrice = JSON.parse(resp.data.lastPrice);
-				const meta = JSON.parse(resp.data.metaInfo);
+				const supData = JSON.parse(resp.data.supplementary_data);
 
 				return {
 					priceData,
-					fullData,
-					changePercent,
-					lastPrice,
-					meta,
-					priceChange,
+					supData,
 				};
 			})
 			.catch((err) => {
@@ -96,15 +93,15 @@ const StockGraph = () => {
 					const priceData = resp.priceData;
 					const newAreaSeries = chart.addAreaSeries({
 						topColor:
-							resp.priceChange > 0
+							resp.supData.priceChange > 0
 								? "rgba(76, 175, 80, 0.56)"
 								: "rgba(242, 139, 130, 0.56)",
 						bottomColor:
-							resp.priceChange > 0
+							resp.supData.priceChange > 0
 								? "rgba(76, 175, 80, 0.04)"
 								: "rgba(242, 139, 130, 0.04)",
 						lineColor:
-							resp.priceChange > 0
+							resp.supData.priceChange > 0
 								? "rgba(76, 175, 80, 1)"
 								: "rgba(242, 139, 130, 1)",
 						lineWidth: 2,
@@ -114,13 +111,8 @@ const StockGraph = () => {
 
 					setAreaSeries(newAreaSeries);
 					setPriceInfo({
-						percentChange: resp.changePercent,
-						priceChange: resp.priceChange,
-						lastPrice: resp.lastPrice,
-					});
-					setStockInfo({
-						exchange: resp.meta.exchangeCode,
-						name: resp.meta.name,
+						percentChange: resp.supData.percentChange,
+						priceChange: resp.supData.priceChange,
 					});
 				}
 			});
@@ -175,15 +167,15 @@ const StockGraph = () => {
 				const priceData = resp.priceData;
 				const newAreaSeries = newChart.addAreaSeries({
 					topColor:
-						resp.priceChange > 0
+						resp.supData.priceChange > 0
 							? "rgba(76, 175, 80, 0.56)"
 							: "rgba(242, 139, 130, 0.56)",
 					bottomColor:
-						resp.priceChange > 0
+						resp.supData.priceChange > 0
 							? "rgba(76, 175, 80, 0.04)"
 							: "rgba(242, 139, 130, 0.04)",
 					lineColor:
-						resp.priceChange > 0
+						resp.supData.priceChange > 0
 							? "rgba(76, 175, 80, 1)"
 							: "rgba(242, 139, 130, 1)",
 					lineWidth: 2,
@@ -193,13 +185,20 @@ const StockGraph = () => {
 
 				setAreaSeries(newAreaSeries);
 				setPriceInfo({
-					percentChange: resp.changePercent,
-					priceChange: resp.priceChange,
-					lastPrice: resp.lastPrice,
+					percentChange: resp.supData.percentChange,
+					priceChange: resp.supData.priceChange,
 				});
 				setStockInfo({
-					exchange: resp.meta.exchangeCode,
-					name: resp.meta.name,
+					avgVolume: resp.supData.avg_volume,
+					highPrice52: resp.supData.high_price_52,
+					lowPrice52: resp.supData.low_price_52,
+					divYield: resp.supData.div_yield,
+					name: resp.supData.name,
+					exchange: resp.supData.exchangeCode,
+					lastPrice: resp.supData.lastPrice,
+					openPrice: resp.supData.openPrice,
+					highPrice: resp.supData.highPrice,
+					lowPrice: resp.supData.lowPrice,
 				});
 				setChart(newChart);
 			}
@@ -240,7 +239,7 @@ const StockGraph = () => {
 											variant="h5"
 											display="inline"
 										>
-											{priceInfo.lastPrice}{" "}
+											{stockInfo.lastPrice}{" "}
 										</Typography>
 										USD
 									</Grid>
@@ -293,6 +292,145 @@ const StockGraph = () => {
 					</Button>
 				))}
 			</div>
+			{stockInfo && (
+				<div className={classes.footerDiv}>
+					<Grid container spacing={1}>
+						<Grid container item xs={12} spacing={3}>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											Open
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2">
+											{stockInfo.openPrice}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											Mkt cap
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2"></Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											Avg Volume
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2">
+											{`${(
+												stockInfo.avgVolume /
+												10 ** 6
+											).toFixed(2)}M`}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+						</Grid>
+						<Grid container item xs={12} spacing={3}>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											High
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2">
+											{stockInfo.highPrice}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											P/E ratio
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2"></Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											52-wk high
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2">
+											{stockInfo.highPrice52}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+						</Grid>
+						<Grid container item xs={12} spacing={3}>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											Low
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2">
+											{stockInfo.lowPrice}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											Div yield
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2">
+											{stockInfo.divYield > 0
+												? `${stockInfo.divYield}%`
+												: "--"}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+							<Grid item xs={4}>
+								<Grid container spacing={1}>
+									<Grid item xs={6}>
+										<Typography variant="subtitle1">
+											52-wk low
+										</Typography>
+									</Grid>
+									<Grid item xs={6}>
+										<Typography variant="subtitle2">
+											{stockInfo.lowPrice52}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+						</Grid>
+					</Grid>
+				</div>
+			)}
 			<div>
 				Try and get volume on chart too (and ideally the pinch thing to
 				see the % change between a and b) AND SHOW HIGH AND LOW POINTS
