@@ -83,6 +83,21 @@ const StockGraph = () => {
 				return null;
 			});
 
+	const lookUpFinancialData = async (ticker) =>
+		axios
+			.get(`/api/fundamentals/${ticker}`, {
+				params: {
+					startDate: JSON.stringify(new Date().getFullYear() - 1),
+				},
+			})
+			.then((resp) => {
+				return JSON.parse(resp.data);
+			})
+			.catch((err) => {
+				alert(err.message);
+				return null;
+			});
+
 	useEffect(() => {
 		if (chart) {
 			if (areaSeries) {
@@ -163,47 +178,87 @@ const StockGraph = () => {
 			},
 		});
 		lookUpData(selectedInterval, ticker).then((resp) => {
-			if (resp !== null) {
-				const priceData = resp.priceData;
-				const newAreaSeries = newChart.addAreaSeries({
-					topColor:
-						resp.supData.priceChange > 0
-							? "rgba(76, 175, 80, 0.56)"
-							: "rgba(242, 139, 130, 0.56)",
-					bottomColor:
-						resp.supData.priceChange > 0
-							? "rgba(76, 175, 80, 0.04)"
-							: "rgba(242, 139, 130, 0.04)",
-					lineColor:
-						resp.supData.priceChange > 0
-							? "rgba(76, 175, 80, 1)"
-							: "rgba(242, 139, 130, 1)",
-					lineWidth: 2,
-				});
-				newAreaSeries.setData(priceData);
-				newChart.timeScale().fitContent();
+			lookUpFinancialData(ticker).then((finStatements) => {
+				if (resp !== null && finStatements !== null) {
+					const priceData = resp.priceData;
+					const newAreaSeries = newChart.addAreaSeries({
+						topColor:
+							resp.supData.priceChange > 0
+								? "rgba(76, 175, 80, 0.56)"
+								: "rgba(242, 139, 130, 0.56)",
+						bottomColor:
+							resp.supData.priceChange > 0
+								? "rgba(76, 175, 80, 0.04)"
+								: "rgba(242, 139, 130, 0.04)",
+						lineColor:
+							resp.supData.priceChange > 0
+								? "rgba(76, 175, 80, 1)"
+								: "rgba(242, 139, 130, 1)",
+						lineWidth: 2,
+					});
+					newAreaSeries.setData(priceData);
+					newChart.timeScale().fitContent();
 
-				setAreaSeries(newAreaSeries);
-				setPriceInfo({
-					percentChange: resp.supData.percentChange,
-					priceChange: resp.supData.priceChange,
-				});
-				setStockInfo({
-					avgVolume: resp.supData.avg_volume,
-					highPrice52: resp.supData.high_price_52,
-					lowPrice52: resp.supData.low_price_52,
-					divYield: resp.supData.div_yield,
-					name: resp.supData.name,
-					exchange: resp.supData.exchangeCode,
-					lastPrice: resp.supData.lastPrice,
-					openPrice: resp.supData.openPrice,
-					highPrice: resp.supData.highPrice,
-					lowPrice: resp.supData.lowPrice,
-				});
-				setChart(newChart);
-			}
+					// A bit fucked right now because we are only using annual data and we need quarterly data in order to get an accurate P/E and mkt cap
+					//!! It also breaks for any company that had a stock split between quarters (but at least using quarterly data will negate this somewhat)
+
+					let dilutedShares = 0;
+					let netIncome = 0;
+					finStatements["2020"].ic.map((entry) => {
+						if (
+							entry.concept ===
+							"WeightedAverageNumberOfDilutedSharesOutstanding"
+						) {
+							dilutedShares = entry.value;
+						} else if (entry.concept === "NetIncomeLoss") {
+							netIncome = entry.value;
+						}
+					});
+
+					let marketCap = resp.supData.lastPrice * dilutedShares;
+					const priceToEarnings = (marketCap / netIncome).toFixed(2);
+
+					if (marketCap > Math.pow(10, 12)) {
+						// Trillion
+						marketCap = `${(marketCap / Math.pow(10, 12)).toFixed(
+							2
+						)}T`;
+					} else if (marketCap > Math.pow(10, 9)) {
+						// Billion
+						marketCap = `${(marketCap / Math.pow(10, 9)).toFixed(
+							2
+						)}B`;
+					} else {
+						//Everything else if million
+						marketCap = `${(marketCap / Math.pow(10, 6)).toFixed(
+							2
+						)}M`;
+					}
+
+					setAreaSeries(newAreaSeries);
+					setPriceInfo({
+						percentChange: resp.supData.percentChange,
+						priceChange: resp.supData.priceChange,
+					});
+					setStockInfo({
+						avgVolume: resp.supData.avg_volume,
+						highPrice52: resp.supData.high_price_52,
+						lowPrice52: resp.supData.low_price_52,
+						divYield: resp.supData.div_yield,
+						name: resp.supData.name,
+						exchange: resp.supData.exchangeCode,
+						lastPrice: resp.supData.lastPrice,
+						openPrice: resp.supData.openPrice,
+						highPrice: resp.supData.highPrice,
+						lowPrice: resp.supData.lowPrice,
+						marketCap,
+						priceToEarnings,
+					});
+					setChart(newChart);
+				}
+			});
 		});
-	}, []);
+	}, [ticker]);
 
 	return (
 		<div>
@@ -318,7 +373,9 @@ const StockGraph = () => {
 										</Typography>
 									</Grid>
 									<Grid item xs={6}>
-										<Typography variant="subtitle2"></Typography>
+										<Typography variant="subtitle2">
+											{stockInfo.marketCap}
+										</Typography>
 									</Grid>
 								</Grid>
 							</Grid>
@@ -363,7 +420,9 @@ const StockGraph = () => {
 										</Typography>
 									</Grid>
 									<Grid item xs={6}>
-										<Typography variant="subtitle2"></Typography>
+										<Typography variant="subtitle2">
+											{stockInfo.priceToEarnings}
+										</Typography>
 									</Grid>
 								</Grid>
 							</Grid>

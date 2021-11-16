@@ -88,9 +88,9 @@ class RESTPriceHistory(Resource):
 
         supplementary_data = {
             "avg_volume": int(df_1yr["adjVolume"].mean()),
-            "high_price_52": df_1yr["adjHigh"].max(),
-            "low_price_52": df_1yr["adjLow"].min(),
-            "div_yield": df_1yr["divCash"].sum() / last_price * 100,
+            "high_price_52": round(df_1yr["adjHigh"].max(), 2),
+            "low_price_52": round(df_1yr["adjLow"].min(), 2),
+            "div_yield": round(df_1yr["divCash"].sum() / last_price * 100, 2),
             "name": meta_info["name"],
             "exchangeCode": meta_info["exchangeCode"],
             "percentChange": round(percent_change, 2),
