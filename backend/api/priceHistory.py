@@ -58,7 +58,7 @@ class RESTPriceHistory(Resource):
             lambda x: x[0:10]
         )  # Truncate the dates to get rid of timestamp
         chartData = df[["date", "adjClose"]]
-        chartData = df.loc[df["date"] > startDate]
+        chartData = df.loc[df["date"] >= startDate]
         chartData = chartData.rename(columns={"date": "time", "adjClose": "value"})
         # df = df[
         #     [
@@ -77,14 +77,22 @@ class RESTPriceHistory(Resource):
             params={"token": api_key},
         ).json()
 
-        df_1yr = df.loc[df["date"] > minStartDate]
-        df = df.loc[df["date"] > startDate]
+        df_1yr = df.loc[df["date"] >= minStartDate]
+        df = df.loc[df["date"] >= startDate]
         last_price = df["adjClose"].iloc[len(df) - 1]
         first_price = df["adjClose"].iloc[0]
         price_change = last_price - first_price
         percent_change = (price_change) / first_price * 100
 
         today_data = df.iloc[len(df) - 1]
+
+        offset = len(df_1yr) - len(df) if len(df_1yr) > len(df) else 0
+        intervalHigh = df.iloc[
+            df["adjClose"].idxmax() - 1 - offset
+        ]  # adjHigh could be used but we aren't using candlesticks so it looks off
+        intervalLow = df.iloc[
+            df["adjClose"].idxmin() - 1 - offset
+        ]  # adjLow could be used but we aren't using candlesticks so it looks off
 
         supplementary_data = {
             "avg_volume": int(df_1yr["adjVolume"].mean()),
@@ -99,9 +107,11 @@ class RESTPriceHistory(Resource):
             "openPrice": today_data["adjOpen"],
             "highPrice": today_data["adjHigh"],
             "lowPrice": today_data["adjLow"],
+            "intervalHigh": intervalHigh["adjClose"],
+            "intervalLow": intervalLow["adjClose"],
+            "dateHigh": intervalHigh["date"],
+            "dateLow": intervalLow["date"],
         }
-
-        # pdb.set_trace()
 
         return {
             # "fullData": df.to_json(orient="records"),

@@ -122,12 +122,45 @@ const StockGraph = () => {
 						lineWidth: 2,
 					});
 					newAreaSeries.setData(priceData);
+					const intervalHigh = resp.supData.intervalHigh;
+					const intervalLow = resp.supData.intervalLow;
+					const dateHigh = resp.supData.dateHigh;
+					const dateLow = resp.supData.dateLow;
+					newAreaSeries.setMarkers([
+						{
+							time: dateHigh,
+							position: "aboveBar",
+							shape: "arrowDown",
+							color: "green",
+							id: "id1",
+							text: `$${intervalHigh.toFixed(2)}`,
+						},
+						{
+							time: dateLow,
+							position: "aboveBar",
+							shape: "arrowDown",
+							color: "red",
+							id: "id2",
+							text: `$${intervalLow.toFixed(2)}`,
+						},
+					]);
+					// chart.subscribeCrosshairMove((param) => {
+					// 	console.log(param.hoveredMarkerId);
+					// });
+
+					// chart.subscribeClick((param) => {
+					// 	console.log(param.hoveredMarkerId);
+					// });
 					chart.timeScale().fitContent();
 
 					setAreaSeries(newAreaSeries);
 					setPriceInfo({
 						percentChange: resp.supData.percentChange,
 						priceChange: resp.supData.priceChange,
+						intervalHigh: resp.supData.intervalHigh,
+						intervalLow: resp.supData.intervalLow,
+						dateHigh: resp.supData.dateHigh,
+						dateLow: resp.supData.dateLow,
 					});
 				}
 			});
@@ -197,6 +230,28 @@ const StockGraph = () => {
 						lineWidth: 2,
 					});
 					newAreaSeries.setData(priceData);
+					const intervalHigh = resp.supData.intervalHigh;
+					const intervalLow = resp.supData.intervalLow;
+					const dateHigh = resp.supData.dateHigh;
+					const dateLow = resp.supData.dateLow;
+					newAreaSeries.setMarkers([
+						{
+							time: dateHigh,
+							position: "aboveBar",
+							shape: "arrowDown",
+							color: "green",
+							id: "id1",
+							text: `$${intervalHigh.toFixed(2)}`,
+						},
+						{
+							time: dateLow,
+							position: "aboveBar",
+							shape: "arrowDown",
+							color: "red",
+							id: "id2",
+							text: `$${intervalLow.toFixed(2)}`,
+						},
+					]);
 					newChart.timeScale().fitContent();
 
 					// A bit fucked right now because we are only using annual data and we need quarterly data in order to get an accurate P/E and mkt cap
@@ -239,6 +294,10 @@ const StockGraph = () => {
 					setPriceInfo({
 						percentChange: resp.supData.percentChange,
 						priceChange: resp.supData.priceChange,
+						intervalHigh: resp.supData.intervalHigh,
+						intervalLow: resp.supData.intervalLow,
+						dateHigh: resp.supData.dateHigh,
+						dateLow: resp.supData.dateLow,
 					});
 					setStockInfo({
 						avgVolume: resp.supData.avg_volume,
@@ -491,19 +550,13 @@ const StockGraph = () => {
 				</div>
 			)}
 			<div>
-				Try and get volume on chart too (and ideally the pinch thing to
-				see the % change between a and b) AND SHOW HIGH AND LOW POINTS
+				SHOW HIGH AND LOW POINTS ideally add the pinch thing too to see
+				the % change between a and b but dont try too hard for this
+				Volume not needed on this chart
 			</div>
 			<div>
 				I also need to figure out what to do with 1D and 5D charts
 				eventually but thats a later issue
-			</div>
-			<div>
-				Add the useful info like open high low, mkt cap, etc. (basically
-				what google has)
-			</div>
-			<div>
-				Figure out what to do about typing in a new ticker not working
 			</div>
 		</div>
 	);

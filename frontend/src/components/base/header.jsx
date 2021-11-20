@@ -18,12 +18,9 @@ const Header = ({ headerHeight }) => {
 	const inputRef = useRef();
 	const history = useHistory();
 
-	useEffect(() => {
-		inputRef.current.focus();
-	}, [searchValue]);
-
 	const searchTicker = () => {
 		history.push(`/ticker/${searchValue.toUpperCase()}`);
+		setSearchValue("");
 	};
 
 	const handleChange = (e) => {
@@ -53,6 +50,7 @@ const Header = ({ headerHeight }) => {
 								"aria-label": "search",
 								maxLength: "5",
 							}}
+							value={searchValue}
 							inputRef={inputRef}
 							onKeyDown={(e) => {
 								if (e.key === "Escape") {
