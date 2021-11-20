@@ -10,7 +10,7 @@ import pandas as pd
 tiingo_url = os.environ.get("tiingo_url")
 api_key = os.environ.get("tiingo_key")
 
-# /watchlists
+# /comparisons
 class RESTComparisons(Resource):
     def get(self):
         # https://api.tiingo.com/tiingo/daily/<ticker>/prices?startDate=2012-1-1&endDate=2016-1-1
@@ -31,17 +31,31 @@ class RESTComparisons(Resource):
                 params={"startDate": startDate, "endDate": endDate, "token": api_key},
             ).json()
             df = pd.DataFrame(price_data)
-            df["date"] = df["date"].apply(lambda x: x[0:10])  # idk what this does tbh
-            df = df.set_index("date")
+            df["date"] = df["date"].apply(
+                lambda x: x[0:10]
+            )  # Truncate the dates to get rid of timestamp
+            df = df.set_index("date")  # Set index to date
             df = df[
-                ["adjClose", "adjOpen", "adjHigh", "adjLow", "adjVolume", "divCash"]
+                [
+                    "adjClose",
+                    "adjOpen",
+                    "adjHigh",
+                    "adjLow",
+                    "adjVolume",
+                    "divCash",
+                ]  # only get the cool columns
             ]
             # df.rename(columns={'adjClose':ticker}, inplace=True)
-            stocks_dict[ticker] = df["adjClose"]
-            initial_prices[ticker] = df["adjClose"].iloc[0]
+            stocks_dict[ticker] = df["adjClose"]  # We only need the adjClose columns
+            initial_prices[ticker] = df["adjClose"].iloc[
+                0
+            ]  # Initial price will be the first close
 
-        df = pd.DataFrame(stocks_dict)
+        df = pd.DataFrame(
+            stocks_dict
+        )  # Remake the dataframe from the dictionary of dataframes, very cool
 
+        # Change the column names to be the ticker boys
         labels = {}
         for ticker in stocks:
             initial_price = initial_prices[ticker]
@@ -51,7 +65,9 @@ class RESTComparisons(Resource):
             # pdb.set_trace()
             labels[ticker] = "{}- {}%".format(ticker, round(total_gain, 1))
 
-        df = df / initial_prices - 1
-        df.rename(columns=labels, inplace=True)
+        df = df / initial_prices - 1  # Make the prices relative
+        df.rename(
+            columns=labels, inplace=True
+        )  # Column names are like AAPL-100% and whatnot
 
         return df.to_json(orient="split")

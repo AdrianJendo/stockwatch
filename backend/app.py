@@ -7,6 +7,8 @@ from flask_cors import CORS
 
 from api import dev
 from api import comparisons
+from api import priceHistory
+from api import fundamentals
 
 # dotenv
 load_dotenv(find_dotenv())
@@ -33,6 +35,12 @@ api.add_resource(comparisons.RESTComparisons, "/comparisons")
 
 # users
 api.add_resource(dev.RESTUsers, "/users")
+
+# price history graph
+api.add_resource(priceHistory.RESTPriceHistory, "/ticker/<ticker>")
+
+# fundamental data
+api.add_resource(fundamentals.RESTFundamentalData, "/fundamentals/<ticker>")
 
 # Register Routes
 app.register_blueprint(api_bp, url_prefix="/api")

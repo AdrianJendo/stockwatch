@@ -4,7 +4,7 @@ import Sidebar from "components/base/sidebar";
 import Heatmap from "components/heatmap";
 import Comparisons from "components/comparisons/comparisons";
 import WatchlistView from "components//watchlists/watchlistView";
-import TickerView from "components/tickerView";
+import StockGraph from "components/stockGraph/stockGraph";
 import React from "react";
 import { makeStyles } from "@material-ui/core";
 
@@ -47,8 +47,8 @@ function Routes() {
 							/>
 							<Route
 								exact
-								path="/ticker"
-								component={TickerView}
+								path="/ticker/:ticker"
+								component={StockGraph}
 							/>
 						</Switch>
 					</div>
