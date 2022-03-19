@@ -15,7 +15,7 @@ export const lightTheme = {
             main: "#f44336",
         },
         text: {
-            primary: "black",
+            primary: "#000000",
         },
     },
     components: {
@@ -24,7 +24,7 @@ export const lightTheme = {
                 // Name of the slot
                 root: {
                     // Some CSS
-                    color: "black",
+                    color: "#000000",
                 },
             },
         },
