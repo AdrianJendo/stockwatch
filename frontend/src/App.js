@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-// import Routes from "./Routes.jsx";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { lightTheme, darkTheme } from "theme/themes";
-import Header from "components/base/header";
+import Dashboard from "components/base/dashboard";
 
 function App() {
     const [dark, setDark] = useState(true);
@@ -11,8 +10,7 @@ function App() {
         <ThemeProvider
             theme={dark ? createTheme(darkTheme) : createTheme(lightTheme)}
         >
-            <Header dark={dark} setDark={setDark} />
-            {/* <Routes /> */}
+            <Dashboard dark={dark} setDark={setDark} />
         </ThemeProvider>
     );
 }
