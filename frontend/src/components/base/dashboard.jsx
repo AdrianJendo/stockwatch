@@ -1,8 +1,8 @@
 import * as React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { styled, useTheme } from "@mui/material/styles";
-import MUISwitch from "components/base/muiSwitch";
 
+// mui
+import { styled, useTheme } from "@mui/material/styles";
 import {
     Box,
     Drawer,
@@ -18,7 +18,6 @@ import {
     InputBase,
     ListItemText,
 } from "@mui/material";
-
 import {
     Dashboard,
     TrendingUp,
@@ -32,12 +31,16 @@ import {
     CandlestickChart,
 } from "@mui/icons-material";
 
+// components
+import MUISwitch from "components/base/muiSwitch";
+import Comparisons from "components/comparisons/comparisons";
+
+const drawerWidth = 230;
+
 const StyledInput = styled(InputBase)(() => ({
     marginLeft: "10px",
     width: "120px",
 }));
-
-const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
     ({ theme, open }) => ({
@@ -86,36 +89,28 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export default function PersistentDrawerLeft(props) {
+    const { dark, setDark } = props;
     const theme = useTheme();
     const [open, setOpen] = React.useState(true);
-
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
-
-    const { dark, setDark } = props;
     const [searchValue, setSearchValue] = React.useState("");
     const inputRef = React.useRef();
-    // const history = useHistory();
 
-    const searchTicker = () => {
-        console.log("Hello");
-        // history.push(`/ticker/${searchValue.toUpperCase()}`);
-        // setSearchValue("");
-    };
-
-    const handleChange = (e) => {
-        if (e.target.value.length <= 5) {
-            setSearchValue(e.target.value);
-        }
+    const toggleDrawer = () => {
+        setOpen(!open);
     };
 
     const toggleSwitch = () => {
         setDark(!dark);
+    };
+
+    const searchTicker = () => {
+        console.log("Hello");
+    };
+
+    const handleSearchChange = (e) => {
+        if (e.target.value.length <= 5) {
+            setSearchValue(e.target.value);
+        }
     };
 
     return (
@@ -132,7 +127,7 @@ export default function PersistentDrawerLeft(props) {
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={handleDrawerOpen}
+                        onClick={toggleDrawer}
                         edge="start"
                         sx={{ mr: 2, ...(open && { display: "none" }) }}
                     >
@@ -186,7 +181,7 @@ export default function PersistentDrawerLeft(props) {
                                         searchTicker();
                                     }
                                 }}
-                                onChange={handleChange}
+                                onChange={handleSearchChange}
                             />
                         </div>
                     </div>
@@ -207,7 +202,7 @@ export default function PersistentDrawerLeft(props) {
                 open={open}
             >
                 <DrawerHeader>
-                    <IconButton onClick={handleDrawerClose}>
+                    <IconButton onClick={toggleDrawer}>
                         {theme.direction === "ltr" ? (
                             <ChevronLeft />
                         ) : (
@@ -297,10 +292,7 @@ export default function PersistentDrawerLeft(props) {
                             path="/heatmap"
                             element={<Typography>Heatmap</Typography>}
                         />
-                        <Route
-                            path="/comparisons"
-                            element={<Typography>Comparison</Typography>}
-                        />
+                        <Route path="/comparisons" element={<Comparisons />} />
                         <Route
                             path="/technical"
                             element={

@@ -1,7 +1,15 @@
 import React, { useState } from "react";
+
+// style
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { lightTheme, darkTheme } from "theme/themes";
+
+// components
 import Dashboard from "components/base/dashboard";
+
+// date
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
 
 function App() {
     const [dark, setDark] = useState(true);
@@ -10,7 +18,9 @@ function App() {
         <ThemeProvider
             theme={dark ? createTheme(darkTheme) : createTheme(lightTheme)}
         >
-            <Dashboard dark={dark} setDark={setDark} />
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Dashboard dark={dark} setDark={setDark} />
+            </LocalizationProvider>
         </ThemeProvider>
     );
 }
