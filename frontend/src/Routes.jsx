@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Header from "components/base/header";
 import Sidebar from "components/base/sidebar";
 import Heatmap from "components/heatmap";
 import Comparisons from "components/comparisons/comparisons";
@@ -9,7 +8,6 @@ import React from "react";
 import { makeStyles } from "@material-ui/core";
 
 const drawerWidth = 240;
-const headerHeight = 64;
 
 const useStyles = makeStyles((theme) => ({
 	toolbar: theme.mixins.toolbar,
@@ -29,13 +27,12 @@ function Routes() {
 	return (
 		<Router>
 			<div className="App">
-				<Header headerHeight={headerHeight} />
 				<Sidebar drawerWidth={drawerWidth} />
 				<div className={classes.content}>
 					<div className={classes.toolbar}>
 						<Switch>
 							<Route exact path="/" component={Heatmap} />
-							<Route
+							{/* <Route
 								exact
 								path="/comparisons"
 								component={Comparisons}
@@ -49,7 +46,7 @@ function Routes() {
 								exact
 								path="/ticker/:ticker"
 								component={StockGraph}
-							/>
+							/> */}
 						</Switch>
 					</div>
 				</div>

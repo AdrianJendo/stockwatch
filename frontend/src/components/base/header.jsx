@@ -1,42 +1,46 @@
 import React, { useState, useEffect, useRef } from "react";
-// import { Link } from "react-router-dom";
-import {
-	AppBar,
-	Toolbar,
-	Typography,
-	InputBase,
-	Button,
-} from "@material-ui/core";
-import SearchIcon from "@material-ui/icons/Search";
+import { AppBar, Box, Toolbar, Typography, Button, Link } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import PropTypes from "prop-types";
-import { useStyles } from "./headerStyle";
-import { useHistory } from "react-router";
+import MUISwitch from "components/base/muiSwitch";
 
-const Header = ({ headerHeight }) => {
-	const classes = useStyles({ headerHeight })();
-	const [searchValue, setSearchValue] = useState("");
-	const inputRef = useRef();
-	const history = useHistory();
+const Header = (props) => {
+    const { dark, setDark } = props;
+    const [searchValue, setSearchValue] = useState("");
+    const inputRef = useRef();
+    // const history = useHistory();
 
-	const searchTicker = () => {
-		history.push(`/ticker/${searchValue.toUpperCase()}`);
-		setSearchValue("");
-	};
+    const searchTicker = () => {
+        console.log("Hello");
+        // history.push(`/ticker/${searchValue.toUpperCase()}`);
+        // setSearchValue("");
+    };
 
-	const handleChange = (e) => {
-		if (e.target.value.length <= 5) {
-			setSearchValue(e.target.value);
-		}
-	};
+    const handleChange = (e) => {
+        if (e.target.value.length <= 5) {
+            setSearchValue(e.target.value);
+        }
+    };
 
-	return (
-		<div className={classes.root}>
-			<AppBar position="fixed" className={classes.appBar}>
-				<Toolbar className={classes.toolbar}>
-					<Typography className={classes.title} variant="h6" noWrap>
-						StockWatch
-					</Typography>
-					<div className={classes.search}>
+    const toggleSwitch = () => {
+        setDark(!dark);
+    };
+
+    return (
+        <Box sx={{ flexGrow: 1 }}>
+            <AppBar position="static" style={{ height: "64px" }}>
+                <Toolbar>
+                    <Link
+                        href="/"
+                        color="inherit"
+                        sx={{ flexGrow: 1 }}
+                        underline="none"
+                    >
+                        <Typography variant="h6" component="div">
+                            StockWatch
+                        </Typography>
+                    </Link>
+                    {/* <div className={classes.search}>
 						<div className={classes.searchIcon}>
 							<SearchIcon />
 						</div>
@@ -75,15 +79,17 @@ const Header = ({ headerHeight }) => {
 						>
 							Search
 						</Button>
-					)}
-				</Toolbar>
-			</AppBar>
-		</div>
-	);
+					)} */}
+
+                    <MUISwitch defaultChecked toggleSwitch={toggleSwitch} />
+                </Toolbar>
+            </AppBar>
+        </Box>
+    );
 };
 
 Header.propTypes = {
-	headerHeight: PropTypes.number,
+    headerHeight: PropTypes.number,
 };
 
 export default Header;

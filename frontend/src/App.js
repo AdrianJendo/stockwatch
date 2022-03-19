@@ -1,24 +1,20 @@
-import React from "react";
-import Routes from "./Routes.jsx";
-import { ThemeProvider, createTheme } from "@material-ui/core";
-
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-
-const darkTheme = createTheme({
-	palette: {
-		type: "dark",
-	},
-});
+import React, { useState } from "react";
+// import Routes from "./Routes.jsx";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { lightTheme, darkTheme } from "theme/themes";
+import Header from "components/base/header";
 
 function App() {
-	return (
-		<MuiPickersUtilsProvider utils={DateFnsUtils}>
-			<ThemeProvider theme={darkTheme}>
-				<Routes />
-			</ThemeProvider>
-		</MuiPickersUtilsProvider>
-	);
+    const [dark, setDark] = useState(true);
+
+    return (
+        <ThemeProvider
+            theme={dark ? createTheme(darkTheme) : createTheme(lightTheme)}
+        >
+            <Header dark={dark} setDark={setDark} />
+            {/* <Routes /> */}
+        </ThemeProvider>
+    );
 }
 
 export default App;
