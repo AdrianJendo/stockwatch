@@ -550,9 +550,8 @@ const StockGraph = () => {
 				</div>
 			)}
 			<div>
-				SHOW HIGH AND LOW POINTS ideally add the pinch thing too to see
-				the % change between a and b but dont try too hard for this
-				Volume not needed on this chart
+				ideally add the pinch thing too to see the % change between a
+				and b but dont try too hard for this
 			</div>
 			<div>
 				I also need to figure out what to do with 1D and 5D charts
