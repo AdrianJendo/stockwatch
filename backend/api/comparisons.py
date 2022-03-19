@@ -18,10 +18,10 @@ class RESTComparisons(Resource):
         stocks = json.loads(request.args.get("stocks"))
         startDate = datetime.strptime(
             request.args.get("startDate"), "%a %b %d %Y"
-        ).strftime("%Y-%m-01")
+        ).strftime("%Y-%m-%d")
         endDate = datetime.strptime(
             request.args.get("endDate"), "%a %b %d %Y"
-        ).strftime("%Y-%m-01")
+        ).strftime("%Y-%m-%d")
 
         stocks_dict = {}
         initial_prices = {}

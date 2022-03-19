@@ -59,6 +59,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
         }),
         backgroundColor: theme.palette.background.default,
         height: "100%",
+        overflow: "auto",
     })
 );
 

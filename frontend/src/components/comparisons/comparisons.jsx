@@ -1,14 +1,53 @@
 import React, { useState } from "react";
-import {
-    TextField,
-    Button,
-    ButtonGroup,
-    Paper,
-    Typography,
-} from "@mui/material";
+import { TextField, Button, ButtonGroup, Typography } from "@mui/material";
 import DatePicker from "@mui/lab/DatePicker";
 import axios from "axios";
-import Chart from "chart.js/auto";
+import { Line } from "react-chartjs-2";
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from "chart.js";
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
+
+const chartOptions = {
+    responsive: true,
+    plugins: {
+        legend: {
+            position: "top",
+        },
+        title: {
+            display: true,
+            text: "Relative stock returns",
+        },
+    },
+    elements: {
+        point: {
+            radius: 0,
+        },
+    },
+    scales: {
+        x: {
+            ticks: {
+                maxTicksLimit: 35,
+            },
+        },
+    },
+};
 
 const Comparisons = () => {
     const [startDate, setStartDate] = useState(
@@ -18,6 +57,8 @@ const Comparisons = () => {
     const [tickerText, setTickerText] = useState("");
     const [stocks, setStocks] = useState([]);
     const [hoveringOver, setHoveringOver] = useState(-1);
+    const [chartData, setChartData] = useState({});
+    const [chartLoading, setChartLoading] = useState(false);
 
     const handleTickerTextChange = (e) => {
         setTickerText(e.target.value);
@@ -62,36 +103,8 @@ const Comparisons = () => {
         };
     };
 
-    const loadData = (dataObj, colors) => {
-        const priceData = [];
-        for (let i = 0; i < dataObj.columns.length; ++i) {
-            const temp = [];
-            for (let j = 0; j < dataObj.data.length; ++j) {
-                temp.push(dataObj.data[j][i]);
-            }
-            if (i < colors.length) {
-                priceData.push({
-                    data: temp,
-                    label: dataObj.columns[i],
-                    borderColor: colors[i],
-                    fill: false,
-                });
-            } else {
-                priceData.push({
-                    data: temp,
-                    label: dataObj.columns[i],
-                    borderColor: "#3e95cd",
-                    fill: false,
-                });
-            }
-        }
-        return priceData;
-    };
-
     const loadGraph = (
-        dataObj,
-        ctx,
-        title,
+        respData,
         zero_line = false,
         colors = [
             "#3e95cd",
@@ -104,53 +117,37 @@ const Comparisons = () => {
             "#CD5C5C",
         ]
     ) => {
-        const relativePrices = loadData(dataObj, colors);
-        if (zero_line) {
-            relativePrices.push(fillZero(dataObj));
+        // Format data
+        const chartPriceData = [];
+        for (let i = 0; i < respData.columns.length; ++i) {
+            const tickerPriceData = [];
+            for (let j = 0; j < respData.data.length; ++j) {
+                tickerPriceData.push(respData.data[j][i]);
+            }
+            chartPriceData.push({
+                data: tickerPriceData,
+                label: respData.columns[i],
+                borderColor: colors[i % colors.length],
+                fill: false,
+            });
         }
 
-        console.log(relativePrices);
-        console.log(dataObj);
+        if (zero_line) {
+            chartPriceData.push(fillZero(respData));
+        }
 
-        new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: dataObj.index,
-                datasets: relativePrices,
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: title,
-                },
-                elements: {
-                    point: {
-                        radius: 0,
-                    },
-                },
-                scales: {
-                    xAxes: [
-                        {
-                            ticks: {
-                                maxTicksLimit: 42,
-                            },
-                        },
-                    ],
-                },
-            },
-        });
+        // Set data options
+        const data = {
+            labels: respData.index,
+            datasets: chartPriceData,
+        };
+
+        setChartData({ data });
     };
 
     const graphStocks = () => {
-        const comparisonsChart = Chart.getChart("comparisonsChart");
-        try {
-            comparisonsChart.destroy();
-        } catch {}
-        const ctx = document
-            .getElementById("comparisonsChart")
-            .getContext("2d");
-        ctx.font = "30px Arial";
-        ctx.fillText("Loading...", 10, 50);
+        setChartLoading(true);
+        setChartData({});
         axios
             .get("/api/comparisons", {
                 params: {
@@ -160,7 +157,8 @@ const Comparisons = () => {
                 },
             })
             .then((resp) => {
-                loadGraph(JSON.parse(resp.data), ctx, "Relative stock returns");
+                setChartLoading(false);
+                loadGraph(JSON.parse(resp.data));
             })
             .catch((err) => alert(err.message));
     };
@@ -236,8 +234,17 @@ const Comparisons = () => {
                 minDate={startDate}
                 renderInput={(params) => <TextField {...params} />}
             />
-            <div>
-                <canvas id="comparisonsChart"></canvas>
+            <div
+                style={{ width: "90%", margin: "auto", paddingBottom: "60px" }}
+            >
+                {chartData.data && (
+                    <Line options={chartOptions} data={chartData.data} />
+                )}
+                {chartLoading && (
+                    <Typography sx={{ fontSize: "30px" }}>
+                        Loading...
+                    </Typography>
+                )}
             </div>
         </div>
     );
