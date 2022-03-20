@@ -18,21 +18,21 @@ const columns = [
 ];
 
 const StocksTable = (props) => {
-    const { stocks, setStocks } = props;
+    const { items, setItems } = props;
 
-    const removeStock = (tickerToRemove) => {
-        setStocks(stocks.filter((ticker) => ticker !== tickerToRemove));
+    const removeStock = (idToRemove) => {
+        setItems(items.filter((item) => item.id !== idToRemove));
     };
 
     // populate rows
     const rows = [];
-    stocks.forEach((stock) => {
+    items.forEach((item) => {
         // lookup stock from database and error if not valid
         rows.push({
-            sec_name: stock,
-            ticker: stock,
+            sec_name: item.name,
+            ticker: item.ticker,
             remove: (
-                <IconButton onClick={() => removeStock(stock)}>
+                <IconButton onClick={() => removeStock(item.id)}>
                     <ClearIcon />
                 </IconButton>
             ),
@@ -65,20 +65,16 @@ const StocksTable = (props) => {
                                     hover
                                     role="checkbox"
                                     tabIndex={-1}
-                                    key={row.name}
+                                    key={row.sec_name}
                                 >
                                     {columns.map((column) => {
-                                        const value = row[column.id];
                                         return (
                                             <TableCell
                                                 key={column.id}
                                                 align={column.align}
                                                 sx={{ padding: "0px 16px" }}
                                             >
-                                                {column.format &&
-                                                typeof value === "number"
-                                                    ? column.format(value)
-                                                    : value}
+                                                {row[column.id]}
                                             </TableCell>
                                         );
                                     })}

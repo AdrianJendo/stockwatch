@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { TextField, Button, Typography } from "@mui/material";
-import DatePicker from "@mui/lab/DatePicker";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
 import {
@@ -13,6 +11,10 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
+import * as XLSX from "xlsx";
+
+import { TextField, Button, Typography } from "@mui/material";
+import DatePicker from "@mui/lab/DatePicker";
 
 import ComparisonStocksTable from "components/comparisons/comparisonStocksTable";
 
@@ -48,6 +50,17 @@ const chartOptions = {
                 maxTicksLimit: 35,
             },
         },
+        y: {
+            title: {
+                display: true,
+                text: "Percent Return",
+            },
+            ticks: {
+                callback: function (value) {
+                    return (value * 100).toFixed(0) + "%"; // convert it to percentage
+                },
+            },
+        },
     },
 };
 
@@ -59,7 +72,7 @@ const Comparisons = () => {
     );
     const [endDate, setEndDate] = useState(new Date());
     const [tickerText, setTickerText] = useState("");
-    const [stocks, setStocks] = useState([]);
+    const [comparisonItems, setComparisonItems] = useState([]);
     const [chartData, setChartData] = useState({});
     const [chartLoading, setChartLoading] = useState(false);
 
@@ -78,12 +91,12 @@ const Comparisons = () => {
     const addStockToComparison = () => {
         if (
             tickerText.length <= 5 &&
-            !stocks.includes(tickerText.toUpperCase()) &&
-            stocks.length <= MAX_COMPARISONS
+            !comparisonItems.includes(tickerText.toUpperCase()) &&
+            comparisonItems.length <= MAX_COMPARISONS
         ) {
-            const newStocks = stocks.slice();
+            const newStocks = comparisonItems.slice();
             newStocks.push(tickerText.toUpperCase());
-            setStocks(newStocks);
+            setComparisonItems(newStocks);
             setTickerText("");
         } else {
             if (tickerText.length <= 5) {
@@ -153,7 +166,7 @@ const Comparisons = () => {
                 params: {
                     startDate: startDate.toDateString(),
                     endDate: endDate.toDateString(),
-                    stocks: JSON.stringify(stocks),
+                    items: JSON.stringify(comparisonItems),
                 },
             })
             .then((resp) => {
@@ -161,6 +174,60 @@ const Comparisons = () => {
                 loadGraph(JSON.parse(resp.data));
             })
             .catch((err) => alert(err.message));
+    };
+
+    const uploadPortfolio = (e) => {
+        const newComparisonItems = comparisonItems.slice();
+        const numFiles = e.target.files.length; // allow uploading of multiple portfolios at once
+
+        // traverse each uploaded file
+        for (let i = 0; i < numFiles; i++) {
+            const file = e.target.files[i];
+            const fileReader = new FileReader();
+            try {
+                fileReader.readAsBinaryString(file);
+            } catch {}
+
+            fileReader.onload = (e) => {
+                /* Parse data */
+                const bstr = e.target.result;
+                const wb = XLSX.read(bstr, { type: "binary" });
+                // traverse all the sheets
+                for (let j = 0; j < wb.SheetNames.length; j++) {
+                    const wsName = wb.SheetNames[j];
+                    const ws = wb.Sheets[wsName];
+                    const wsData = XLSX.utils.sheet_to_csv(ws, { header: 1 });
+                    const wsRows = wsData.split("\n");
+                    const rowData = wsRows.slice(1);
+                    const columns = wsRows[0].toLowerCase().split(",");
+                    const containsWeightsCol = "weight" in columns;
+                    const portfolio = {};
+
+                    rowData.forEach((row) => {
+                        const rowVals = row.split(",");
+                        const ticker = rowVals[0];
+                        const weight = containsWeightsCol
+                            ? parseInt(rowVals[1]) / 100
+                            : 1 / rowData.length;
+
+                        portfolio[ticker] = weight;
+                    });
+
+                    if (!newComparisonItems.some((item) => item.id === wsName))
+                        newComparisonItems.push({
+                            id: wsName,
+                            name: wsName,
+                            ticker: "N/A",
+                            values: portfolio,
+                        });
+                }
+
+                if (i === numFiles - 1) {
+                    setComparisonItems(newComparisonItems);
+                }
+            };
+        }
+        e.target.value = "";
     };
 
     return (
@@ -227,12 +294,21 @@ const Comparisons = () => {
                         renderInput={(params) => <TextField {...params} />}
                     />
                 </div>
+
+                <Button
+                    variant="contained"
+                    component="label"
+                    onChange={(e) => uploadPortfolio(e)}
+                >
+                    Upload Portfolio
+                    <input type="file" hidden multiple />
+                </Button>
             </div>
-            {stocks.length ? (
+            {comparisonItems.length ? (
                 <div style={{ width: "50%", margin: "auto" }}>
                     <ComparisonStocksTable
-                        stocks={stocks}
-                        setStocks={setStocks}
+                        items={comparisonItems}
+                        setItems={setComparisonItems}
                     />
                 </div>
             ) : (
@@ -246,7 +322,7 @@ const Comparisons = () => {
                 variant="contained"
                 color="primary"
                 onClick={graphStocks}
-                disabled={stocks.length === 0}
+                disabled={comparisonItems.length === 0}
             >
                 Graph
             </Button>
