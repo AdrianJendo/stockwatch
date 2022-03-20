@@ -50,7 +50,7 @@ class RESTComparisons(Resource):
                             "adjLow",
                             "adjVolume",
                             "divCash",
-                        ]  # only get the cool columns
+                        ]  # only get the useful columns
                     ]
                     items_dict[ticker] = df[
                         "adjClose"
