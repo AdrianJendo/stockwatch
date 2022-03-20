@@ -84,26 +84,28 @@ const Comparisons = () => {
 
     const handleAddStock = (e) => {
         if (e.key === "Enter") {
-            addStockToComparison();
+            addStockToComparison(tickerText);
         }
     };
 
-    const addStockToComparison = () => {
+    const addStockToComparison = (ticker) => {
         if (
-            tickerText.length <= 5 &&
-            !comparisonItems.includes(tickerText.toUpperCase()) &&
+            ticker.length <= 5 &&
+            !comparisonItems.some((item) => item.id === ticker.toUpperCase()) &&
             comparisonItems.length <= MAX_COMPARISONS
         ) {
-            const newStocks = comparisonItems.slice();
-            newStocks.push(tickerText.toUpperCase());
-            setComparisonItems(newStocks);
-            setTickerText("");
+            const newComparisonItems = comparisonItems.slice();
+            newComparisonItems.push({
+                id: ticker.toUpperCase(),
+                name: ticker.toUpperCase(),
+                ticker: ticker.toUpperCase(),
+                values: { [ticker.toUpperCase()]: 1 },
+            });
+            setComparisonItems(newComparisonItems);
         } else {
-            if (tickerText.length <= 5) {
-                setTickerText("");
-            }
             alert("Error");
         }
+        setTickerText("");
     };
 
     const fillZero = (serverResponse) => {
@@ -200,20 +202,27 @@ const Comparisons = () => {
                     const wsRows = wsData.split("\n");
                     const rowData = wsRows.slice(1);
                     const columns = wsRows[0].toLowerCase().split(",");
-                    const containsWeightsCol = "weight" in columns;
+                    const containsWeightsCol = columns.includes("weight");
                     const portfolio = {};
 
+                    let weightSum = 0;
                     rowData.forEach((row) => {
                         const rowVals = row.split(",");
                         const ticker = rowVals[0];
                         const weight = containsWeightsCol
                             ? parseInt(rowVals[1]) / 100
-                            : 1 / rowData.length;
+                            : Math.floor((1 / rowData.length) * 100) / 100;
 
                         portfolio[ticker] = weight;
+                        weightSum += weight;
                     });
 
-                    if (!newComparisonItems.some((item) => item.id === wsName))
+                    if (weightSum > 1) {
+                        alert("Portfolio weights are greater than 1");
+                        return;
+                    }
+
+                    if (!comparisonItems.some((item) => item.id === wsName))
                         newComparisonItems.push({
                             id: wsName,
                             name: wsName,
@@ -259,7 +268,7 @@ const Comparisons = () => {
                     <Button
                         variant={tickerText !== "" ? "contained" : "outlined"}
                         disabled={tickerText === ""}
-                        onClick={addStockToComparison}
+                        onClick={() => addStockToComparison(tickerText)}
                     >
                         Add
                     </Button>

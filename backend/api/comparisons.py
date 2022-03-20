@@ -63,25 +63,26 @@ class RESTComparisons(Resource):
             items_dict
         )  # Remake the dataframe from the dictionary of dataframes, very cool
 
-        def get_port_value(row, numShares={}):
-            port_value = 0
+        def get_port_value(row, numShares={}, port_value=0):
             for ticker in numShares.keys():
                 port_value += row[ticker] * numShares[ticker]
             return port_value
 
         # Deal with portfolios by
         for item in items:
-            if len(item["values"]) > 1:  # Check item is portfolio
+            if item["id"] not in initial_prices:  # Check item is portfolio
                 numShares = {}
                 port_value = 10000  # arbitrary value for calculating shares
+                cash = port_value  # for portfolios without 100% allocation
                 initial_prices[item["id"]] = port_value
                 for ticker, weight in item["values"].items():
                     numShares[ticker] = (
                         port_value * weight / initial_prices[ticker]
                     )  # calculate number of shares
+                    cash -= port_value * weight
                 # find port value for every time increment and add as column
                 return_df[item["id"]] = return_df.apply(
-                    get_port_value, axis=1, numShares=numShares
+                    get_port_value, axis=1, numShares=numShares, port_value=cash
                 )
 
         # Change the column names to be the label used for the graph
@@ -94,7 +95,7 @@ class RESTComparisons(Resource):
                 * 100
             )
             # pdb.set_trace()
-            labels[item["id"]] = "{}: {}%".format(item["id"], round(total_gain, 1))
+            labels[item["id"]] = "{}: {}%".format(item["id"], round(total_gain, 2))
 
         # Drop columns not in labels
         drop_columns = []
