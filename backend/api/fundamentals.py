@@ -32,3 +32,12 @@ class RESTFundamentalData(Resource):
         df2 = df2.loc[df2["year"] <= endDate]
         df2 = df2.set_index("year")
         return df2.to_json(orient="index")
+
+
+# /balancesheet/:ticker
+
+
+# /cashflow/:ticker
+
+
+# /incomestatement/:ticker

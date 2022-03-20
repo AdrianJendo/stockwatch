@@ -1,24 +1,28 @@
-import React from "react";
-import Routes from "./Routes.jsx";
-import { ThemeProvider, createTheme } from "@material-ui/core";
+import React, { useState } from "react";
 
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+// style
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { lightTheme, darkTheme } from "theme/themes";
 
-const darkTheme = createTheme({
-	palette: {
-		type: "dark",
-	},
-});
+// components
+import Dashboard from "components/base/dashboard";
+
+// date
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
 
 function App() {
-	return (
-		<MuiPickersUtilsProvider utils={DateFnsUtils}>
-			<ThemeProvider theme={darkTheme}>
-				<Routes />
-			</ThemeProvider>
-		</MuiPickersUtilsProvider>
-	);
+    const [dark, setDark] = useState(true);
+
+    return (
+        <ThemeProvider
+            theme={dark ? createTheme(darkTheme) : createTheme(lightTheme)}
+        >
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Dashboard dark={dark} setDark={setDark} />
+            </LocalizationProvider>
+        </ThemeProvider>
+    );
 }
 
 export default App;
