@@ -217,7 +217,7 @@ const Comparisons = () => {
                         newComparisonItems.push({
                             id: wsName,
                             name: wsName,
-                            ticker: "N/A",
+                            ticker: "",
                             values: portfolio,
                         });
                 }
