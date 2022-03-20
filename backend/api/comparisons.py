@@ -3,7 +3,6 @@ from flask_restful import Resource
 from datetime import datetime
 import requests
 import json
-import pdb
 import os
 import pandas as pd
 
@@ -94,7 +93,6 @@ class RESTComparisons(Resource):
                 / initial_price
                 * 100
             )
-            # pdb.set_trace()
             labels[item["id"]] = "{}: {}%".format(item["id"], round(total_gain, 2))
 
         # Drop columns not in labels
