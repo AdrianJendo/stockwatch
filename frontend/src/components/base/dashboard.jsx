@@ -171,7 +171,6 @@ export default function PersistentDrawerLeft(props) {
 
                             <StyledInput
                                 placeholder={"Search…"}
-                                inputProps={{ "aria-label": "add participant" }}
                                 value={searchValue}
                                 inputRef={inputRef}
                                 onKeyDown={(e) => {

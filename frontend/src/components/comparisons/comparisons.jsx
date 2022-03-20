@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, ButtonGroup, Typography } from "@mui/material";
+import { TextField, Button, Typography } from "@mui/material";
 import DatePicker from "@mui/lab/DatePicker";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
@@ -13,6 +13,8 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
+
+import ComparisonStocksTable from "components/comparisons/comparisonStocksTable";
 
 ChartJS.register(
     CategoryScale,
@@ -49,6 +51,8 @@ const chartOptions = {
     },
 };
 
+const MAX_COMPARISONS = 10; // max number of securities for comparison
+
 const Comparisons = () => {
     const [startDate, setStartDate] = useState(
         new Date(new Date().setFullYear(new Date().getFullYear() - 1))
@@ -56,26 +60,28 @@ const Comparisons = () => {
     const [endDate, setEndDate] = useState(new Date());
     const [tickerText, setTickerText] = useState("");
     const [stocks, setStocks] = useState([]);
-    const [hoveringOver, setHoveringOver] = useState(-1);
     const [chartData, setChartData] = useState({});
     const [chartLoading, setChartLoading] = useState(false);
 
     const handleTickerTextChange = (e) => {
-        setTickerText(e.target.value);
+        if (e.target.value.length <= 5) {
+            setTickerText(e.target.value);
+        }
     };
 
     const handleAddStock = (e) => {
         if (e.key === "Enter") {
-            addStockToQueue();
+            addStockToComparison();
         }
     };
 
-    const addStockToQueue = () => {
-        const newStocks = stocks.slice();
+    const addStockToComparison = () => {
         if (
             tickerText.length <= 5 &&
-            !newStocks.includes(tickerText.toUpperCase())
+            !stocks.includes(tickerText.toUpperCase()) &&
+            stocks.length <= MAX_COMPARISONS
         ) {
+            const newStocks = stocks.slice();
             newStocks.push(tickerText.toUpperCase());
             setStocks(newStocks);
             setTickerText("");
@@ -85,12 +91,6 @@ const Comparisons = () => {
             }
             alert("Error");
         }
-    };
-
-    const removeStockFromQueue = (index) => {
-        const newStocks = stocks.slice();
-        newStocks.splice(index, 1);
-        setStocks(newStocks);
     };
 
     const fillZero = (serverResponse) => {
@@ -165,83 +165,108 @@ const Comparisons = () => {
 
     return (
         <div>
-            <TextField
-                sx={{ margin: "10px" }}
-                label="Add Ticker"
-                type="search"
-                value={tickerText}
-                onChange={handleTickerTextChange}
-                onKeyPress={handleAddStock}
-            />
-            <Button
-                sx={{ margin: "10px" }}
-                color={tickerText !== "" ? "primary" : "inherit"}
-                variant={tickerText !== "" ? "contained" : "outlined"}
-                onClick={addStockToQueue}
+            <div
+                style={{
+                    display: "flex",
+                    width: "90%",
+                    margin: "auto",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
             >
-                Add
-            </Button>
-            <div style={{ margin: "30px" }}>
-                <ButtonGroup
-                    variant="text"
-                    color="primary"
-                    aria-label="text primary button group"
+                <div
+                    style={{
+                        display: "flex",
+                        borderRadius: "5%",
+                        border: "1px solid black",
+                        width: "240px",
+                        margin: "20px",
+                    }}
                 >
-                    {stocks.map((stock, index) => (
-                        <Button
-                            color={
-                                index === hoveringOver ? "secondary" : "primary"
-                            }
-                            onMouseEnter={() => setHoveringOver(index)}
-                            onMouseLeave={() => setHoveringOver(-1)}
-                            onClick={() => removeStockFromQueue(index)}
-                            key={index}
-                        >
-                            {stock}
-                        </Button>
-                    ))}
-                </ButtonGroup>
+                    <TextField
+                        label="Add Ticker"
+                        value={tickerText}
+                        onChange={handleTickerTextChange}
+                        onKeyPress={handleAddStock}
+                    />
+                    <Button
+                        variant={tickerText !== "" ? "contained" : "outlined"}
+                        disabled={tickerText === ""}
+                        onClick={addStockToComparison}
+                    >
+                        Add
+                    </Button>
+                </div>
+                <div style={{ margin: "20px" }}>
+                    <DatePicker
+                        label="Start Date"
+                        openTo="year"
+                        views={["year", "month", "day"]}
+                        value={startDate}
+                        onChange={(newDate) => setStartDate(newDate)}
+                        maxDate={endDate}
+                        minDate={
+                            new Date(
+                                new Date().setFullYear(
+                                    new Date().getFullYear() - 19
+                                )
+                            )
+                        }
+                        renderInput={(params) => <TextField {...params} />}
+                    />
+                </div>
+                <div style={{ margin: "20px" }}>
+                    <DatePicker
+                        label="End Date"
+                        openTo="year"
+                        views={["year", "month", "day"]}
+                        value={endDate}
+                        onChange={(newDate) => setEndDate(newDate)}
+                        maxDate={new Date()}
+                        minDate={startDate}
+                        renderInput={(params) => <TextField {...params} />}
+                    />
+                </div>
             </div>
+            {stocks.length ? (
+                <div style={{ width: "50%", margin: "auto" }}>
+                    <ComparisonStocksTable
+                        stocks={stocks}
+                        setStocks={setStocks}
+                    />
+                </div>
+            ) : (
+                <div />
+            )}
             <Button
-                sx={{ margin: "10px" }}
+                sx={{
+                    display: "flex",
+                    margin: "30px auto",
+                }}
                 variant="contained"
                 color="primary"
                 onClick={graphStocks}
+                disabled={stocks.length === 0}
             >
                 Graph
             </Button>
-            <DatePicker
-                label="Start Date"
-                openTo="year"
-                views={["year", "month", "day"]}
-                value={startDate}
-                onChange={(newDate) => setStartDate(newDate)}
-                maxDate={endDate}
-                minDate={
-                    new Date(
-                        new Date().setFullYear(new Date().getFullYear() - 19)
-                    )
-                }
-                renderInput={(params) => <TextField {...params} />}
-            />
-            <DatePicker
-                label="End Date"
-                openTo="year"
-                views={["year", "month", "day"]}
-                value={endDate}
-                onChange={(newDate) => setEndDate(newDate)}
-                maxDate={new Date()}
-                minDate={startDate}
-                renderInput={(params) => <TextField {...params} />}
-            />
+
             <div
-                style={{ width: "90%", margin: "auto", paddingBottom: "60px" }}
+                style={{
+                    width: "90%",
+                    margin: "0px auto 60px auto",
+                    textAlign: "center",
+                }}
             >
                 {chartData.data && (
                     <Line options={chartOptions} data={chartData.data} />
                 )}
                 {chartLoading && (
-                    <Typography sx={{ fontSize: "30px" }}>
+                    <Typography
+                        sx={{
+                            fontSize: "30px",
+                        }}
+                    >
                         Loading...
                     </Typography>
                 )}
