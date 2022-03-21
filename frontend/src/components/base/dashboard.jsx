@@ -33,6 +33,7 @@ import {
 
 // components
 import MUISwitch from "components/base/muiSwitch";
+import Heatmap from "components/heatmap";
 import Comparisons from "components/comparisons/comparisons";
 
 const drawerWidth = 230;
@@ -288,10 +289,7 @@ export default function PersistentDrawerLeft(props) {
                             path="/watchlists"
                             element={<Typography>Watchlists</Typography>}
                         />
-                        <Route
-                            path="/heatmap"
-                            element={<Typography>Heatmap</Typography>}
-                        />
+                        <Route path="/heatmap" element={<Heatmap />} />
                         <Route path="/comparisons" element={<Comparisons />} />
                         <Route
                             path="/technical"
