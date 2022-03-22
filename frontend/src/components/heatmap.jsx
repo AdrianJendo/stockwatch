@@ -17,6 +17,8 @@ const Item = styled(Paper)(({ theme }) => ({
 const Heatmap = () => {
     const [stocks, setStocks] = useState([]);
     const [sectors, setSectors] = useState([]);
+    const [sortedSectors, setSortedSectors] = useState([]);
+    const [maxSectorWeight, setMaxSectorWeight] = useState(0);
 
     console.log(stocks);
     console.log(sectors);
@@ -26,24 +28,52 @@ const Heatmap = () => {
             // You can await here
             const response = await axios.get("/api/heatmap", {
                 params: {
-                    index: "dowjones",
+                    index: "sp500",
                 },
             });
 
             const data = response.data;
+            const sectors = JSON.parse(data.sectors);
 
             setStocks(JSON.parse(data.df));
-            setSectors(data.sectors);
+            setSectors(sectors);
+
+            // Calculate height, width, number of columns
+            setMaxSectorWeight(
+                Object.values(sectors).reduce((prev, cur) =>
+                    Math.max(prev, cur)
+                ),
+                0
+            );
+
+            const sortedSectors = Object.keys(sectors).sort(
+                (a, b) => sectors[b] - sectors[a]
+            );
+            setSortedSectors(sortedSectors);
         };
         getIndexWeights();
     }, [setStocks]);
 
+    console.log(stocks);
+
+    // console.log(
+    //     Object.values(sectors).map((sector) => (sector / maxSectorWeight) * 100)
+    // );
+
     return (
-        <Box>
-            <Masonry columns={5} spacing={0}>
-                {stocks.map((stock, index) => (
-                    <Item key={index} sx={{ height: stock.Weight * 100 }}>
-                        {stock.Company}
+        <Box sx={{ padding: "20px", height: "calc(100vh - 64px - 40px)" }}>
+            <Masonry sx={{ height: "100%" }} columns={4} spacing={2}>
+                {sortedSectors.map((sector, index) => (
+                    <Item
+                        key={index}
+                        sx={{
+                            position: "relative",
+                            height: `${
+                                (sectors[sector] / maxSectorWeight) * 95
+                            }%`,
+                        }}
+                    >
+                        {sector}
                     </Item>
                 ))}
             </Masonry>

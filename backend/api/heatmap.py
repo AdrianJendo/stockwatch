@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
+import json
 
 FINANCIAL_URL = os.environ.get("financial_url")
 FINANCIAL_KEY = os.environ.get("financial_key")
@@ -53,7 +54,6 @@ class RESTHeatmap(Resource):
             table_headers = table.findAll("th")
             for i in range(len(table_headers)):
                 header_text = table_headers[i].text.lower()
-                print(header_text)
                 if "symbol" in header_text or "ticker" in header_text:
                     ticker_col = i
                 elif "sector" in header_text or (
@@ -102,12 +102,19 @@ class RESTHeatmap(Resource):
             df.loc[df["Symbol"] == stock["ticker"], "Sector"] = stock["sector"]
             df.loc[df["Symbol"] == stock["ticker"], "SubSector"] = stock["sub_sector"]
             if stock["sector"] not in sectors:
-                sectors[stock["sector"]] = 1
+                sectors[stock["sector"]] = 0
             if stock["sub_sector"] not in sub_sectors:
-                sub_sectors[stock["sub_sector"]] = 1
+                sub_sectors[stock["sub_sector"]] = 0
+
+            sectors[stock["sector"]] += df.loc[
+                df["Symbol"] == stock["ticker"], "Weight"
+            ].values[0]
+            sub_sectors[stock["sub_sector"]] += df.loc[
+                df["Symbol"] == stock["ticker"], "Weight"
+            ].values[0]
 
         return {
             "df": df.to_json(orient="records"),
-            "sectors": list(sectors.keys()),
-            "sub_sectors": list(sub_sectors.keys()),
+            "sectors": json.dumps(sectors),
+            "sub_sectors": json.dumps(sub_sectors),
         }
