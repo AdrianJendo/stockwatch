@@ -30,7 +30,11 @@ class RESTHeatmap(Resource):
         df = pd.read_html(str(stats))[0]
         df["Sector"] = np.nan
         df["SubSector"] = np.nan
-        df = df.drop(["#", "Price", "Chg", "% Chg"], axis=1)
+        df = df.drop(["#", "Price"], axis=1)
+        # TEMP stuff below, get real price data in the future
+        df["% Chg"] = df["% Chg"].str.strip("()%")
+        df["% Chg"] = pd.to_numeric(df["% Chg"])
+        df["Chg"] = pd.to_numeric(df["Chg"])
 
         # Get sectors of each company in index
         wiki_search_url = "https://en.wikipedia.org/wiki/"
