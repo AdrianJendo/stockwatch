@@ -12,6 +12,8 @@ const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     padding: theme.spacing(0.5),
     textAlign: "center",
+    alignItems: "top",
+    justifyContent: "top",
 }));
 
 const Heatmap = () => {
@@ -61,22 +63,29 @@ const Heatmap = () => {
     // );
 
     return (
-        <Box sx={{ padding: "20px", height: "calc(100vh - 64px - 40px)" }}>
-            <Masonry sx={{ height: "100%" }} columns={4} spacing={2}>
-                {sortedSectors.map((sector, index) => (
-                    <Item
-                        key={index}
-                        sx={{
-                            position: "relative",
-                            height: `${
-                                (sectors[sector] / maxSectorWeight) * 95
-                            }%`,
-                        }}
-                    >
-                        {sector}
-                    </Item>
-                ))}
-            </Masonry>
+        <Box
+            sx={{
+                padding: "20px",
+                height: "calc(100vh - 64px - 40px)",
+                display: "flex",
+                flexWrap: "wrap",
+            }}
+        >
+            {sortedSectors.map((sector, index) => (
+                <Item
+                    sx={{
+                        position: "relative",
+                        margin: "10px",
+                        width: `${sectors[sector] * 1.8}%`,
+                        height: `${sectors[sector] * 1.8}%`,
+                        top: "0px",
+                        flexGrow: 1,
+                    }}
+                    key={index}
+                >
+                    {sector}
+                </Item>
+            ))}
         </Box>
     );
 };
