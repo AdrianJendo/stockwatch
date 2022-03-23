@@ -73,111 +73,111 @@ const Heatmap = (props) => {
             sx={{
                 padding: "20px",
                 height: "calc(100vh - 64px - 40px)",
-                display: "flex",
-                flexWrap: "wrap",
+                // display: "flex",
+                // flexWrap: "wrap",
             }}
         >
-            {/* <Masonry sx={{ height: "100%" }} columns={numCols} spacing={1}> */}
-            {sortedSectors.map((sector, i) => (
-                <Item
-                    key={sector}
-                    // sx={{
-                    //     position: "relative",
-                    //     height: `${sectors[sector] * 100}%`,
-                    //     backgroundColor:
-                    //         stocks[sector].reduce(
-                    //             (prev, cur) =>
-                    //                 (prev += cur["% Chg"] * cur["Weight"]),
-                    //             0
-                    //         ) > 0
-                    //             ? "green"
-                    //             : "red",
-                    //     filter: `brightness(${Math.min(
-                    //         Math.max(
-                    //             stocks[sector].reduce(
-                    //                 (prev, cur) =>
-                    //                     (prev +=
-                    //                         cur["% Chg"] *
-                    //                         cur["Weight"] *
-                    //                         100),
-                    //                 0
-                    //             ),
-                    //             70
-                    //         ),
-                    //         100
-                    //     )}%)`,
-                    // }}
-                    sx={{
-                        position: "relative",
-                        // maxHeight: "calc(100% - 30px)",
-                        maxWidth: "32%",
-                        margin: "5px",
-                        minHeight: `${sectors[sector] * 100}%`,
-                        flexGrow: 1,
-                    }}
-                >
-                    <Typography variant="caption" sx={{ height: "10px" }}>
-                        {sector}
-                    </Typography>
-                    <div
-                        style={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            height: "calc(100% - 20px)",
+            <Masonry sx={{ height: "100%" }} columns={numCols} spacing={1}>
+                {sortedSectors.map((sector, i) => (
+                    <Item
+                        key={sector}
+                        // sx={{
+                        //     position: "relative",
+                        //     height: `${sectors[sector] * 100}%`,
+                        // }}
+                        sx={{
+                            // position: "relative",
+                            // maxHeight: "calc(100% - 30px)",
+                            // maxWidth: "32%",
+                            margin: "5px",
+                            // minHeight: `${sectors[sector] * 100}%`,
+                            // flexGrow: 1,
+                            backgroundColor:
+                                stocks[sector].reduce(
+                                    (prev, cur) =>
+                                        (prev += cur["% Chg"] * cur["Weight"]),
+                                    0
+                                ) > 0
+                                    ? "green"
+                                    : "red",
+                            filter: `brightness(${Math.min(
+                                Math.max(
+                                    stocks[sector].reduce(
+                                        (prev, cur) =>
+                                            (prev +=
+                                                cur["% Chg"] *
+                                                cur["Weight"] *
+                                                100),
+                                        0
+                                    ),
+                                    70
+                                ),
+                                100
+                            )}%)`,
                         }}
                     >
-                        {stocks[sector].map((stock, j) => {
-                            if (j < 100) {
-                                return (
-                                    <Item
-                                        key={stock.Symbol}
-                                        sx={{
-                                            position: "relative",
-                                            // maxHeight: "calc(100% - 30px)",
-                                            minHeight: "1px",
-                                            margin: "5px",
-                                            minWidth: `${
-                                                (stock.Weight /
-                                                    sectorWeights[sector]) *
-                                                100
-                                            }%`,
-
-                                            backgroundColor:
-                                                stock["% Chg"] > 0
-                                                    ? "green"
-                                                    : "red",
-                                            filter: `brightness(${Math.min(
-                                                Math.max(
-                                                    stock["% Chg"] * 100,
-                                                    90
-                                                ),
-                                                180
-                                            )}%)`,
-                                        }}
-                                    >
-                                        <div
-                                            style={{
+                        <Typography variant="caption" sx={{ height: "10px" }}>
+                            {sector}
+                        </Typography>
+                        <div
+                            style={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                height: "calc(100% - 20px)",
+                            }}
+                        >
+                            {stocks[sector].map((stock, j) => {
+                                if (j < 100) {
+                                    return (
+                                        <Item
+                                            key={stock.Symbol}
+                                            sx={{
                                                 position: "relative",
-                                                top: "40%",
+                                                // maxHeight: "calc(100% - 30px)",
+                                                minHeight: "1px",
+                                                margin: "5px",
+                                                minWidth: `${
+                                                    (stock.Weight /
+                                                        sectorWeights[sector]) *
+                                                    100
+                                                }%`,
+
+                                                backgroundColor:
+                                                    stock["% Chg"] > 0
+                                                        ? "green"
+                                                        : "red",
+                                                filter: `brightness(${Math.min(
+                                                    Math.max(
+                                                        stock["% Chg"] * 100,
+                                                        90
+                                                    ),
+                                                    180
+                                                )}%)`,
                                             }}
                                         >
-                                            <Typography variant="caption">
-                                                {stock.Company}
-                                            </Typography>
-                                            <br />
-                                            <Typography variant="caption">
-                                                {stock["% Chg"]}%
-                                            </Typography>
-                                        </div>
-                                    </Item>
-                                );
-                            }
-                            return <div key={stock.Symbol}></div>;
-                        })}
-                    </div>
-                </Item>
-            ))}
-            {/* </Masonry> */}
+                                            <div
+                                                style={{
+                                                    position: "relative",
+                                                    top: "40%",
+                                                }}
+                                            >
+                                                <Typography variant="caption">
+                                                    {stock.Company}
+                                                </Typography>
+                                                <br />
+                                                <Typography variant="caption">
+                                                    {stock["% Chg"]}%
+                                                </Typography>
+                                            </div>
+                                        </Item>
+                                    );
+                                }
+                                return <div key={stock.Symbol}></div>;
+                            })}
+                        </div>
+                    </Item>
+                ))}
+            </Masonry>
         </Box>
     );
 };
