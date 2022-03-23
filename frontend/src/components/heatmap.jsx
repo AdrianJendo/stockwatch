@@ -62,36 +62,23 @@ const Heatmap = (props) => {
     }, [index, setStocks]);
 
     // TODO
-    // 1: Show top 5 stocks for each section
-    // 2. Green / red based on entire sector (and weighting of each stock)
-    // 3. Add dropdown to app bar to choose index
-    console.log(stocks);
-    console.log(sectors);
+    // Add dropdown to app bar to choose index
+    // Make the proportions actually work
 
     return (
         <Box
             sx={{
                 padding: "20px",
                 height: "calc(100vh - 64px - 40px)",
-                // display: "flex",
-                // flexWrap: "wrap",
             }}
         >
             <Masonry sx={{ height: "100%" }} columns={numCols} spacing={1}>
-                {sortedSectors.map((sector, i) => (
+                {sortedSectors.map((sector) => (
                     <Item
                         key={sector}
-                        // sx={{
-                        //     position: "relative",
-                        //     height: `${sectors[sector] * 100}%`,
-                        // }}
                         sx={{
-                            // position: "relative",
-                            // maxHeight: "calc(100% - 30px)",
-                            // maxWidth: "32%",
-                            margin: "5px",
-                            // minHeight: `${sectors[sector] * 100}%`,
-                            // flexGrow: 1,
+                            position: "relative",
+                            height: `${sectors[sector] * 100}%`,
                             backgroundColor:
                                 stocks[sector].reduce(
                                     (prev, cur) =>
@@ -127,21 +114,14 @@ const Heatmap = (props) => {
                             }}
                         >
                             {stocks[sector].map((stock, j) => {
-                                if (j < 100) {
+                                if (j < 5) {
                                     return (
                                         <Item
                                             key={stock.Symbol}
                                             sx={{
                                                 position: "relative",
-                                                // maxHeight: "calc(100% - 30px)",
-                                                minHeight: "1px",
+                                                flexGrow: 1,
                                                 margin: "5px",
-                                                minWidth: `${
-                                                    (stock.Weight /
-                                                        sectorWeights[sector]) *
-                                                    100
-                                                }%`,
-
                                                 backgroundColor:
                                                     stock["% Chg"] > 0
                                                         ? "green"
