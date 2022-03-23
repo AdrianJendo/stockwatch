@@ -291,7 +291,7 @@ export default function PersistentDrawerLeft(props) {
                         />
                         <Route
                             path="/heatmap"
-                            element={<Heatmap index="dowjones" />}
+                            element={<Heatmap index="sp500" />}
                         />
                         <Route path="/comparisons" element={<Comparisons />} />
                         <Route
