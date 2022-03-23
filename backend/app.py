@@ -7,6 +7,7 @@ from flask_cors import CORS
 
 from api import dev
 from api import comparisons
+from api import heatmap
 from api import priceHistory
 from api import fundamentals
 
@@ -32,6 +33,9 @@ api.add_resource(dev.RESTWatchlistColumns, "/columns/<watchlist_id>")
 
 # comparisons
 api.add_resource(comparisons.RESTComparisons, "/comparisons")
+
+# heatmap
+api.add_resource(heatmap.RESTHeatmap, "/heatmap")
 
 # users
 api.add_resource(dev.RESTUsers, "/users")
