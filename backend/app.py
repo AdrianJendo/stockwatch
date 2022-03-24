@@ -5,11 +5,11 @@ import os
 from dotenv import load_dotenv, find_dotenv
 from flask_cors import CORS
 
-from api import dev
+from api_useless import dev
 from api import comparisons
 from api import heatmap
 from api import priceHistory
-from api import fundamentals
+from api_useless import fundamentals
 
 # dotenv
 load_dotenv(find_dotenv())
