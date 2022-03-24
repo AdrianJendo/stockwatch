@@ -7,7 +7,8 @@ import { StockMarket } from "react-ts-tradingview-widgets";
 import { ForexCrossRates } from "react-ts-tradingview-widgets";
 import { CryptoCurrencyMarket } from "react-ts-tradingview-widgets";
 
-const MarketOverview = () => {
+const MarketOverview = (props) => {
+    const { theme } = props;
     return (
         <Box
             sx={{
@@ -20,11 +21,11 @@ const MarketOverview = () => {
         >
             <div style={{ width: "50%", height: "100%" }}>
                 <div style={{ height: "50%" }}>
-                    <MarketData colorTheme="dark" autoSize={true}></MarketData>
+                    <MarketData colorTheme={theme} autoSize={true}></MarketData>
                 </div>
                 <div style={{ height: "50%" }}>
                     <ForexCrossRates
-                        colorTheme="dark"
+                        colorTheme={theme}
                         autoSize={true}
                     ></ForexCrossRates>
                 </div>
@@ -32,14 +33,14 @@ const MarketOverview = () => {
             <div style={{ width: "50%", height: "100%" }}>
                 <div style={{ height: "50%" }}>
                     <CryptoCurrencyMarket
-                        colorTheme="dark"
+                        colorTheme={theme}
                         width="100%"
                         height={450}
                     ></CryptoCurrencyMarket>
                 </div>
                 <div style={{ height: "50%" }}>
                     <StockMarket
-                        colorTheme="dark"
+                        colorTheme={theme}
                         autoSize={true}
                         width="100%"
                         height={400}

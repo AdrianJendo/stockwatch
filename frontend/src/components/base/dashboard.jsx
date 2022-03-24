@@ -121,6 +121,8 @@ export default function PersistentDrawerLeft(props) {
         }
     };
 
+    const colorTheme = dark ? "dark" : "light";
+
     return (
         <Box
             sx={{
@@ -317,7 +319,10 @@ export default function PersistentDrawerLeft(props) {
                 <div style={{ height: "calc(100vh - 64px - 40px)" }}>
                     <Router>
                         <Routes>
-                            <Route path="/" element={<MarketOverview />} />
+                            <Route
+                                path="/"
+                                element={<MarketOverview theme={colorTheme} />}
+                            />
                             <Route
                                 path="/watchlists"
                                 element={<Typography>Watchlists</Typography>}
@@ -334,9 +339,7 @@ export default function PersistentDrawerLeft(props) {
                             <Route
                                 path="/technical"
                                 element={
-                                    <TechnicalAnalysis
-                                        theme={dark ? "dark" : "light"}
-                                    />
+                                    <TechnicalAnalysis theme={colorTheme} />
                                 }
                             />
                             <Route
