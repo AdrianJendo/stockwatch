@@ -14,7 +14,6 @@ const Heatmap = (props) => {
     const [stocks, setStocks] = useState({});
     const [sectors, setSectors] = useState([]);
     const [sortedSectors, setSortedSectors] = useState([]);
-    const [sectorWeights, setSectorWeights] = useState({});
     const [numCols, setNumCols] = useState(0);
 
     const { index } = props;
@@ -43,20 +42,16 @@ const Heatmap = (props) => {
                 (a, b) => sectors[b] - sectors[a]
             );
             const stocks = {};
-            const sectorWeights = {};
             stocksData.forEach((stock) => {
                 if (!stocks[stock.Sector]) {
                     stocks[stock.Sector] = [];
-                    sectorWeights[stock.Sector] = 0;
                 }
                 stocks[stock.Sector].push(stock);
-                sectorWeights[stock.Sector] += stock.Weight;
             });
             setStocks(stocks);
             setSortedSectors(sortedSectors);
             setSectors(sectors);
             setNumCols(index === "sp500" ? 4 : index === "dowjones" ? 7 : 3);
-            setSectorWeights(sectorWeights);
         };
         getIndexWeights();
     }, [index, setStocks]);
