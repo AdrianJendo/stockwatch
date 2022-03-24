@@ -29,13 +29,18 @@ import {
     Search,
     GridView,
     CandlestickChart,
+    Info,
+    CurrencyBitcoin,
 } from "@mui/icons-material";
 
 // components
 import MUISwitch from "components/base/muiSwitch";
 import Heatmap from "components/heatmap";
 import Comparisons from "components/comparisons/comparisons";
-import DashboardView from "components/dashboard/dashboard";
+import MarketOverview from "components/marketOverview/marketOverview";
+import TechnicalAnalysis from "components/technicalAnalysis/technicalAnalysis";
+import About from "components/about/about";
+import Crypto from "components/crypto/crypto";
 
 const drawerWidth = 230;
 
@@ -115,6 +120,8 @@ export default function PersistentDrawerLeft(props) {
             setSearchValue(e.target.value);
         }
     };
+
+    const colorTheme = dark ? "dark" : "light";
 
     return (
         <Box
@@ -216,7 +223,7 @@ export default function PersistentDrawerLeft(props) {
                 <List>
                     {[
                         {
-                            text: "Dashboard",
+                            text: "Market Overview",
                             icon: <GridView />,
                             link: "/",
                         },
@@ -234,6 +241,11 @@ export default function PersistentDrawerLeft(props) {
                             text: "Comparisons",
                             icon: <CompareArrows />,
                             link: "/comparisons",
+                        },
+                        {
+                            text: "Crypto",
+                            icon: <CurrencyBitcoin />,
+                            link: "/crypto",
                         },
                     ].map((item) => (
                         <Link
@@ -277,35 +289,71 @@ export default function PersistentDrawerLeft(props) {
                         </Link>
                     ))}
                 </List>
+                <Divider />
+                <List>
+                    {[
+                        {
+                            text: "About",
+                            icon: <Info />,
+                            link: "/about",
+                        },
+                    ].map((item) => (
+                        <Link
+                            href={item.link}
+                            color="inherit"
+                            underline="none"
+                            key={item.text}
+                            sx={{ padding: 0 }}
+                        >
+                            <ListItem button>
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.text} />
+                            </ListItem>
+                        </Link>
+                    ))}
+                </List>
             </Drawer>
             <Main open={open}>
                 <DrawerHeader />
-                <Router>
-                    <Routes>
-                        <Route path="/" element={<DashboardView />} />
-                        <Route
-                            path="/watchlists"
-                            element={<Typography>Watchlists</Typography>}
-                        />
-                        <Route
-                            path="/heatmap"
-                            element={<Heatmap index="dowjones" />}
-                        />
-                        <Route path="/comparisons" element={<Comparisons />} />
-                        <Route
-                            path="/technical"
-                            element={
-                                <Typography>Technical Analysis</Typography>
-                            }
-                        />
-                        <Route
-                            path="/fundamental"
-                            element={
-                                <Typography>Fundamental Analysis</Typography>
-                            }
-                        />
-                    </Routes>
-                </Router>
+
+                <div style={{ height: "calc(100vh - 64px - 40px)" }}>
+                    <Router>
+                        <Routes>
+                            <Route
+                                path="/"
+                                element={<MarketOverview theme={colorTheme} />}
+                            />
+                            <Route
+                                path="/watchlists"
+                                element={<Typography>Watchlists</Typography>}
+                            />
+                            <Route
+                                path="/heatmap"
+                                element={<Heatmap index="dowjones" />}
+                            />
+                            <Route
+                                path="/comparisons"
+                                element={<Comparisons />}
+                            />
+                            <Route path="/crypto" element={<Crypto />} />
+                            <Route
+                                path="/technical"
+                                element={
+                                    <TechnicalAnalysis theme={colorTheme} />
+                                }
+                            />
+                            <Route
+                                path="/fundamental"
+                                element={
+                                    <Typography>
+                                        Fundamental Analysis
+                                    </Typography>
+                                }
+                            />
+                            <Route path="/about" element={<About />} />
+                        </Routes>
+                    </Router>
+                </div>
             </Main>
         </Box>
     );
