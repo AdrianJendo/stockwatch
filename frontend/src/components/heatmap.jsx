@@ -64,7 +64,7 @@ const Heatmap = (props) => {
         <Box
             sx={{
                 padding: "20px",
-                height: "calc(100vh - 64px - 40px)",
+                height: "100%",
             }}
         >
             <Masonry sx={{ height: "100%" }} columns={numCols} spacing={1}>

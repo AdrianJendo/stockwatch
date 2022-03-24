@@ -281,30 +281,42 @@ export default function PersistentDrawerLeft(props) {
             </Drawer>
             <Main open={open}>
                 <DrawerHeader />
-                <Router>
-                    <Routes>
-                        <Route path="/" element={<DashboardView />} />
-                        <Route
-                            path="/watchlists"
-                            element={<Typography>Watchlists</Typography>}
-                        />
-                        <Route
-                            path="/heatmap"
-                            element={<Heatmap index="dowjones" />}
-                        />
-                        <Route path="/comparisons" element={<Comparisons />} />
-                        <Route
-                            path="/technical"
-                            element={<TechnicalAnalysis />}
-                        />
-                        <Route
-                            path="/fundamental"
-                            element={
-                                <Typography>Fundamental Analysis</Typography>
-                            }
-                        />
-                    </Routes>
-                </Router>
+
+                <div style={{ height: "calc(100vh - 64px - 40px)" }}>
+                    <Router>
+                        <Routes>
+                            <Route path="/" element={<DashboardView />} />
+                            <Route
+                                path="/watchlists"
+                                element={<Typography>Watchlists</Typography>}
+                            />
+                            <Route
+                                path="/heatmap"
+                                element={<Heatmap index="dowjones" />}
+                            />
+                            <Route
+                                path="/comparisons"
+                                element={<Comparisons />}
+                            />
+                            <Route
+                                path="/technical"
+                                element={
+                                    <TechnicalAnalysis
+                                        theme={dark ? "dark" : "light"}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/fundamental"
+                                element={
+                                    <Typography>
+                                        Fundamental Analysis
+                                    </Typography>
+                                }
+                            />
+                        </Routes>
+                    </Router>
+                </div>
             </Main>
         </Box>
     );
