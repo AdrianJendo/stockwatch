@@ -29,14 +29,16 @@ import {
     Search,
     GridView,
     CandlestickChart,
+    Info,
 } from "@mui/icons-material";
 
 // components
 import MUISwitch from "components/base/muiSwitch";
 import Heatmap from "components/heatmap";
 import Comparisons from "components/comparisons/comparisons";
-import DashboardView from "components/dashboard/dashboard";
+import MarketOverview from "components/marketOverview/marketOverview";
 import TechnicalAnalysis from "components/technicalAnalysis/technicalAnalysis";
+import About from "components/about/about";
 
 const drawerWidth = 230;
 
@@ -217,7 +219,7 @@ export default function PersistentDrawerLeft(props) {
                 <List>
                     {[
                         {
-                            text: "Dashboard",
+                            text: "Market Overview",
                             icon: <GridView />,
                             link: "/",
                         },
@@ -278,6 +280,29 @@ export default function PersistentDrawerLeft(props) {
                         </Link>
                     ))}
                 </List>
+                <Divider />
+                <List>
+                    {[
+                        {
+                            text: "About",
+                            icon: <Info />,
+                            link: "/about",
+                        },
+                    ].map((item) => (
+                        <Link
+                            href={item.link}
+                            color="inherit"
+                            underline="none"
+                            key={item.text}
+                            sx={{ padding: 0 }}
+                        >
+                            <ListItem button>
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.text} />
+                            </ListItem>
+                        </Link>
+                    ))}
+                </List>
             </Drawer>
             <Main open={open}>
                 <DrawerHeader />
@@ -285,7 +310,7 @@ export default function PersistentDrawerLeft(props) {
                 <div style={{ height: "calc(100vh - 64px - 40px)" }}>
                     <Router>
                         <Routes>
-                            <Route path="/" element={<DashboardView />} />
+                            <Route path="/" element={<MarketOverview />} />
                             <Route
                                 path="/watchlists"
                                 element={<Typography>Watchlists</Typography>}
@@ -314,6 +339,7 @@ export default function PersistentDrawerLeft(props) {
                                     </Typography>
                                 }
                             />
+                            <Route path="/about" element={<About />} />
                         </Routes>
                     </Router>
                 </div>
