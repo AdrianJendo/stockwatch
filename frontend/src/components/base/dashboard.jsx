@@ -30,6 +30,7 @@ import {
     GridView,
     CandlestickChart,
     Info,
+    CurrencyBitcoin,
 } from "@mui/icons-material";
 
 // components
@@ -39,6 +40,7 @@ import Comparisons from "components/comparisons/comparisons";
 import MarketOverview from "components/marketOverview/marketOverview";
 import TechnicalAnalysis from "components/technicalAnalysis/technicalAnalysis";
 import About from "components/about/about";
+import Crypto from "components/crypto/crypto";
 
 const drawerWidth = 230;
 
@@ -238,6 +240,11 @@ export default function PersistentDrawerLeft(props) {
                             icon: <CompareArrows />,
                             link: "/comparisons",
                         },
+                        {
+                            text: "Crypto",
+                            icon: <CurrencyBitcoin />,
+                            link: "/crypto",
+                        },
                     ].map((item) => (
                         <Link
                             href={item.link}
@@ -323,6 +330,7 @@ export default function PersistentDrawerLeft(props) {
                                 path="/comparisons"
                                 element={<Comparisons />}
                             />
+                            <Route path="/crypto" element={<Crypto />} />
                             <Route
                                 path="/technical"
                                 element={
