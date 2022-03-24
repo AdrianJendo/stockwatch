@@ -45,14 +45,15 @@ const Dashboard = () => {
                     My main focus for this app right now is providing tools for
                     conducting fundamental analysis. I want to figure out a way
                     to pull company SEC filings and export data into
-                    standardized excel files for analysis. I've spent countless
-                    hours just copying and pasting financial information from
-                    company filings into excel before even being able to begin
-                    any analysis, and this is a major area where I think this
-                    app can provide value to people. A lot of this app is still
-                    being planned / in progress, and this will definitely be a
-                    project I leave alone for months at a time, and then find
-                    motivation to come back to it and build out a new feature.
+                    standardized excel templates for analysis. I've spent
+                    countless hours copying and pasting financial information
+                    from company filings into an excel spreadsheet before even
+                    being able to begin any analysis, and this is a major area
+                    where I think this app can provide value to people. A lot of
+                    this app is still being planned / in progress, and this will
+                    definitely be a project I leave alone for months at a time,
+                    and then find motivation to come back to it and build out a
+                    new feature.
                 </Typography>
                 <Typography paragraph={true} sx={{ fontSize: 16 }}>
                     Right now, the comparison, heatmap, and technical analysis
