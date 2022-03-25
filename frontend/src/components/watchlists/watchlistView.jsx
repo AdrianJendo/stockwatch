@@ -13,18 +13,18 @@ import {
     Checkbox,
     TableRow,
     Paper,
+    Button,
+    styled,
 } from "@mui/material";
-// import { makeStyles, withStyles } from "@material-ui/core/styles";
 
-// import WatchlistTableHeader from "components/watchlists/watchlistHeader";
-// import WatchlistTableToolbar from "components/watchlists/watchlistToolbar";
-// import {
-// 	getComparator,
-// 	stableSort,
-// } from "components/watchlists/watchlistHelpers";
-// import { ReorderTwoTone } from "@material-ui/icons";
+import WatchlistTableHeader from "components/watchlists/watchlistHeader";
+import WatchlistTableToolbar from "components/watchlists/watchlistToolbar";
+import {
+    getComparator,
+    stableSort,
+} from "components/watchlists/watchlistHelpers";
 
-const defaultColums = [
+const defaultColumns = [
     {
         id: "name",
         label: "Name",
@@ -135,12 +135,6 @@ const defaultColums = [
 // 		width: "100%",
 // 		marginBottom: theme.spacing(2),
 // 	},
-// 	table: {
-// 		minWidth: 750,
-// 	},
-// 	container: {
-// 		maxHeight: `max(calc(80vh - 64px), 300px)`,
-// 	},
 // 	visuallyHidden: {
 // 		border: 0,
 // 		clip: "rect(0 0 0 0)",
@@ -154,11 +148,9 @@ const defaultColums = [
 // 	},
 // }));
 
-// const StyledTableCell = withStyles({
-// 	root: {
-// 		cursor: "default",
-// 	},
-// })(TableCell);
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    cursor: "default",
+}));
 
 const WatchlistView = () => {
     // const classes = useStyles();
@@ -170,43 +162,65 @@ const WatchlistView = () => {
     const [editColumnsModalOpen, setEditColumnsModalOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const [watchlistID, setWatchlistID] = useState(0);
     const [watchlists, setWatchlists] = useState([]);
-    const [watchlistItems, setWatchlistItems] = useState([]);
-    const [columns, setColumns] = useState([]);
+    const [selectedWatchlist, setSelectedWatchlist] = useState(0); // index of selected watchlist
 
     useEffect(() => {
-        axios
-            .get("/api/watchlists")
-            .then((res) => {
-                const watchlists = res.data;
-                if (watchlists.length) {
-                    axios
-                        .get(`/api/watchlists/${watchlists[0].id}`)
-                        .then((res) => {
-                            const watchlist = res.data;
-                            const columns = watchlist.columns;
-                            const tickers = watchlist.tickers;
-                            axios
-                                .get("/api/newcolumndata", {
-                                    params: {
-                                        columns: JSON.stringify(columns),
-                                        tickers: JSON.stringify(tickers),
-                                    },
-                                })
-                                .then((res) => {
-                                    setWatchlistID(watchlist.id);
-                                    setColumns(columns);
-                                    setWatchlistItems(res.data);
-                                    setWatchlists(watchlists);
-                                })
-                                .catch((err) => alert(err.message));
-                        })
-                        .catch((err) => alert(err.message));
-                }
-            })
-            .catch((err) => alert(err.message));
+        // axios
+        //     .get("/api/watchlists")
+        //     .then((res) => {
+        //         const watchlists = res.data;
+        //         if (watchlists.length) {
+        //             axios
+        //                 .get(`/api/watchlists/${watchlists[0].id}`)
+        //                 .then((res) => {
+        //                     const watchlist = res.data;
+        //                     const columns = watchlist.columns;
+        //                     const tickers = watchlist.tickers;
+        //                     axios
+        //                         .get("/api/newcolumndata", {
+        //                             params: {
+        //                                 columns: JSON.stringify(columns),
+        //                                 tickers: JSON.stringify(tickers),
+        //                             },
+        //                         })
+        //                         .then((res) => {
+        //                             setWatchlistID(watchlist.id);
+        //                             setColumns(columns);
+        //                             setWatchlistItems(res.data);
+        //                             setWatchlists(watchlists);
+        //                         })
+        //                         .catch((err) => alert(err.message));
+        //                 })
+        //                 .catch((err) => alert(err.message));
+        //         }
+        //     })
+        //     .catch((err) => alert(err.message));
     }, []);
+
+    const createWatchlist = () => {
+        const newWatchlists = watchlists.slice();
+        newWatchlists.push({
+            name: `TEST${watchlists.length}`,
+            id: watchlists.length,
+            columns: defaultColumns,
+            tickers: [
+                { name: "Facebook", ticker: "FB", category: "equity" },
+                { name: "Apple Inc.", ticker: "AAPL", category: "equity" },
+                { name: "Amazon.com.", ticker: "AMZN", category: "equity" },
+                { name: "Microsoft", ticker: "MSFT", category: "equity" },
+                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
+                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
+                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
+                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
+                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
+                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
+                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
+            ],
+        });
+        setSelectedWatchlist(newWatchlists.length - 1);
+        setWatchlists(newWatchlists);
+    };
 
     const handleEditColumnsModalOpen = () => {
         setEditColumnsModalOpen(true);
@@ -232,7 +246,9 @@ const WatchlistView = () => {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = watchlistItems.map((n) => n.ticker);
+            const newSelected = watchlists[selectedWatchlist].tickers.map(
+                (n) => n.ticker
+            );
             setSelected(newSelected);
             return;
         }
@@ -265,135 +281,160 @@ const WatchlistView = () => {
 
     const handleDeleteRows = () => {
         const newWatchlistItems = [];
-        for (let i = 0; i < watchlistItems.length; ++i) {
-            if (!selected.includes(watchlistItems[i].ticker)) {
-                newWatchlistItems.push(watchlistItems[i]);
+        for (let i = 0; i < watchlists[selectedWatchlist].tickers.length; ++i) {
+            if (
+                !selected.includes(
+                    watchlists[selectedWatchlist].tickers[i].ticker
+                )
+            ) {
+                newWatchlistItems.push(
+                    watchlists[selectedWatchlist].tickers[i]
+                );
             }
         }
 
-        axios
-            .put(`/api/watchlists/${watchlistID}`, {
-                data: newWatchlistItems,
-            })
-            .then(() => {
-                setSelected([]);
-                setWatchlistItems(newWatchlistItems);
-            })
-            .catch((err) => alert(err.message));
+        // axios
+        //     .put(`/api/watchlists/${watchlistID}`, {
+        //         data: newWatchlistItems,
+        //     })
+        //     .then(() => {
+        //         setSelected([]);
+        //         setWatchlistItems(newWatchlistItems);
+        //     })
+        //     .catch((err) => alert(err.message));
     };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
+    console.log(watchlists);
+
     return (
-        <div>
+        <div
+            style={{
+                display: "flex",
+                padding: "20px",
+                margin: "auto",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "90%",
+            }}
+        >
             {watchlists.length > 0 ? (
-                <Paper>
-                    {/* <WatchlistTableToolbar
-						numSelected={selected.length}
-						dense={dense}
-						setDense={setDense}
-						orderBy={orderBy}
-						setOrderBy={setOrderBy}
-						handleTickerModalOpen={handleTickerModalOpen}
-						handleEditColumnsModalOpen={handleEditColumnsModalOpen}
-						setAnchorEl={setAnchorEl}
-						handleDeleteRows={handleDeleteRows}
-					/>
-					<TableContainer className={classes.container}>
-						<Table
-							className={classes.table}
-							aria-labelledby="tableTitle"
-							size={dense ? "small" : "medium"}
-							aria-label="watchlist table"
-							stickyHeader
-						>
-							<WatchlistTableHeader
-								classes={classes}
-								numSelected={selected.length}
-								order={order}
-								orderBy={orderBy}
-								onSelectAllClick={handleSelectAllClick}
-								onRequestSort={handleRequestSort}
-								rowCount={watchlistItems.length}
-								headerCells={columns}
-							/>
-							{columns.length > 0 && (
-								<TableBody>
-									{stableSort(
-										watchlistItems,
-										getComparator(order, orderBy)
-									).map((row, index) => {
-										const isItemSelected = isSelected(
-											row.ticker
-										);
-										const labelId = `watchlist-table-checkbox-${index}`;
+                <Paper sx={{ width: "100%", padding: "10px" }}>
+                    <WatchlistTableToolbar
+                        numSelected={selected.length}
+                        dense={dense}
+                        setDense={setDense}
+                        orderBy={orderBy}
+                        setOrderBy={setOrderBy}
+                        handleTickerModalOpen={handleTickerModalOpen}
+                        handleEditColumnsModalOpen={handleEditColumnsModalOpen}
+                        setAnchorEl={setAnchorEl}
+                        handleDeleteRows={handleDeleteRows}
+                    />
 
-										return (
-											<TableRow
-												hover
-												onClick={(event) =>
-													handleClick(
-														event,
-														row.ticker
-													)
-												}
-												role="checkbox"
-												aria-checked={isItemSelected}
-												tabIndex={-1}
-												key={row.name}
-												selected={isItemSelected}
-											>
-												<StyledTableCell padding="checkbox">
-													<Checkbox
-														checked={isItemSelected}
-														inputProps={{
-															"aria-labelledby":
-																labelId,
-														}}
-													/>
-												</StyledTableCell>
+                    <TableContainer
+                        sx={{
+                            maxHeight: `calc(100vh - 200px)`,
+                            overflowy: "scroll",
+                        }}
+                    >
+                        <Table
+                            aria-labelledby="tableTitle"
+                            size={dense ? "small" : "medium"}
+                            aria-label="watchlist table"
+                            stickyHeader
+                        >
+                            <WatchlistTableHeader
+                                numSelected={selected.length}
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={handleSelectAllClick}
+                                onRequestSort={handleRequestSort}
+                                // rowCount={watchlists[selectedWatchlist].tickers.length}
+                                headerCells={
+                                    watchlists[selectedWatchlist].columns
+                                }
+                            />
+                            {watchlists[selectedWatchlist].columns.length >
+                                0 && (
+                                <TableBody>
+                                    {stableSort(
+                                        watchlists[selectedWatchlist].tickers,
+                                        getComparator(order, orderBy)
+                                    ).map((row, index) => {
+                                        const isItemSelected = isSelected(
+                                            row.ticker
+                                        );
+                                        const labelId = `watchlist-table-checkbox-${index}`;
 
-												{columns.map((column, i) =>
-													i === 0 ? (
-														<StyledTableCell
-															key={column.id}
-															component="th"
-															id={labelId}
-															scope="row"
-															padding="none"
-														>
-															{row[column.id]}
-														</StyledTableCell>
-													) : (
-														<StyledTableCell
-															key={column.id}
-															align="right"
-														>
-															{row[column.id]}
-														</StyledTableCell>
-													)
-												)}
-											</TableRow>
-										);
-									})}
-								</TableBody>
-							)}
-						</Table>
-					</TableContainer> */}
+                                        return (
+                                            <TableRow
+                                                hover
+                                                onClick={(event) =>
+                                                    handleClick(
+                                                        event,
+                                                        row.ticker
+                                                    )
+                                                }
+                                                role="checkbox"
+                                                aria-checked={isItemSelected}
+                                                tabIndex={-1}
+                                                key={row.name}
+                                                selected={isItemSelected}
+                                            >
+                                                <StyledTableCell padding="checkbox">
+                                                    <Checkbox
+                                                        checked={isItemSelected}
+                                                        inputProps={{
+                                                            "aria-labelledby":
+                                                                labelId,
+                                                        }}
+                                                    />
+                                                </StyledTableCell>
+
+                                                {watchlists[
+                                                    selectedWatchlist
+                                                ].columns.map((column, i) =>
+                                                    i === 0 ? (
+                                                        <StyledTableCell
+                                                            key={column.id}
+                                                            component="th"
+                                                            id={labelId}
+                                                            scope="row"
+                                                            padding="none"
+                                                        >
+                                                            {row[column.id]}
+                                                        </StyledTableCell>
+                                                    ) : (
+                                                        <StyledTableCell
+                                                            key={column.id}
+                                                            align="right"
+                                                        >
+                                                            {row[column.id]}
+                                                        </StyledTableCell>
+                                                    )
+                                                )}
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            )}
+                        </Table>
+                    </TableContainer>
                 </Paper>
             ) : (
-                <button>
-                    Create a New Watchlist{" "}
-                    {/* Use this to create first watchlist (implement it after redux) */}
-                </button>
+                <Button variant="contained" onClick={() => createWatchlist()}>
+                    Create a New Watchlist
+                </Button>
             )}
             {/* {tickerModalOpen && (
 				<SearchTickerModal
 					watchlistID={watchlistID}
 					handleClose={handleTickerModalClose}
-					watchlistItems={watchlistItems}
+					watchlistItems={watchlists[selectedWatchlist].tickers}
 					setWatchlistItems={setWatchlistItems}
-					columns={columns}
+					columns={watchlists[selectedWatchlist].columns}
 				/>
 			)} */}
             {/* {editColumnsModalOpen && (
@@ -401,9 +442,9 @@ const WatchlistView = () => {
 					watchlistID={watchlistID}
 					open={editColumnsModalOpen}
 					handleClose={handleEditColumnsModalClose}
-					columns={columns}
+					columns={watchlists[selectedWatchlist].columns}
 					setColumns={setColumns}
-					watchlistItems={watchlistItems}
+					watchlistItems={watchlists[selectedWatchlist].tickers}
 					setWatchlistItems={setWatchlistItems}
 				/>
 			)} */}
@@ -419,15 +460,16 @@ const WatchlistView = () => {
 			/> */}
             {watchlists.length ? (
                 <div>
-                    {watchlistItems.length === 0 && (
+                    {watchlists[selectedWatchlist].tickers.length === 0 && (
                         <div>
                             Your watchlist is empty, try adding some rows using
                             the button on the right of the toolbar
                         </div>
                     )}
-                    {columns.length === 0 && watchlistItems.length > 0 && (
-                        <div>Try Adding some columns</div>
-                    )}
+                    {watchlists[selectedWatchlist].columns.length === 0 &&
+                        watchlists[selectedWatchlist].tickers.length > 0 && (
+                            <div>Try Adding some columns</div>
+                        )}
                 </div>
             ) : undefined}
         </div>

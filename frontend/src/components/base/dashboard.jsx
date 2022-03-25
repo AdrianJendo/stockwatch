@@ -317,7 +317,12 @@ export default function PersistentDrawerLeft(props) {
             <Main open={open}>
                 <DrawerHeader />
 
-                <div style={{ height: "calc(100vh - 64px - 40px)" }}>
+                <div
+                    style={{
+                        height: "calc(100vh - 64px - 40px)",
+                        overflow: "hidden",
+                    }}
+                >
                     <Router>
                         <Routes>
                             <Route
