@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-// import SearchTickerModal from "components/modals/searchTickerModal";
+import SearchTickerModal from "components/modals/searchTickerModal";
 // import EditColumnsModal from "components/modals/editColumnsModal";
 // import WatchlistsPopover from "components/modals/watchlistsPopover";
 // import AddWatchlistModal from "components/modals/addWatchlistModal";
@@ -148,22 +148,21 @@ const defaultColumns = [
 // 	},
 // }));
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCell = styled(TableCell)(() => ({
     cursor: "default",
 }));
 
 const WatchlistView = () => {
-    // const classes = useStyles();
-    const [order, setOrder] = useState("asc");
-    const [orderBy, setOrderBy] = useState("");
-    const [selected, setSelected] = useState([]);
-    const [dense, setDense] = useState(false);
-    const [tickerModalOpen, setTickerModalOpen] = useState(false);
-    const [editColumnsModalOpen, setEditColumnsModalOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [order, setOrder] = useState("asc"); // asc or desc
+    const [orderBy, setOrderBy] = useState(""); // property to order by (ticker, name, price, etc.)
+    const [selected, setSelected] = useState([]); // array of selected rows
+    const [dense, setDense] = useState(false); // dense padding
+    const [tickerModalOpen, setTickerModalOpen] = useState(false); // true when ticker modal open
+    const [editColumnsModalOpen, setEditColumnsModalOpen] = useState(false); // true when edit columns modal open
+    const [anchorEl, setAnchorEl] = useState(null); // needed for watchlists popover
 
     const [watchlists, setWatchlists] = useState([]);
-    const [selectedWatchlist, setSelectedWatchlist] = useState(0); // index of selected watchlist
+    const [watchlistIndex, setWatchlistIndex] = useState(0); // index of selected watchlist
 
     useEffect(() => {
         // axios
@@ -210,15 +209,9 @@ const WatchlistView = () => {
                 { name: "Amazon.com.", ticker: "AMZN", category: "equity" },
                 { name: "Microsoft", ticker: "MSFT", category: "equity" },
                 { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
-                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
-                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
-                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
-                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
-                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
-                { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
             ],
         });
-        setSelectedWatchlist(newWatchlists.length - 1);
+        setWatchlistIndex(newWatchlists.length - 1);
         setWatchlists(newWatchlists);
     };
 
@@ -246,7 +239,7 @@ const WatchlistView = () => {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = watchlists[selectedWatchlist].tickers.map(
+            const newSelected = watchlists[watchlistIndex].tickers.map(
                 (n) => n.ticker
             );
             setSelected(newSelected);
@@ -281,15 +274,11 @@ const WatchlistView = () => {
 
     const handleDeleteRows = () => {
         const newWatchlistItems = [];
-        for (let i = 0; i < watchlists[selectedWatchlist].tickers.length; ++i) {
+        for (let i = 0; i < watchlists[watchlistIndex].tickers.length; ++i) {
             if (
-                !selected.includes(
-                    watchlists[selectedWatchlist].tickers[i].ticker
-                )
+                !selected.includes(watchlists[watchlistIndex].tickers[i].ticker)
             ) {
-                newWatchlistItems.push(
-                    watchlists[selectedWatchlist].tickers[i]
-                );
+                newWatchlistItems.push(watchlists[watchlistIndex].tickers[i]);
             }
         }
 
@@ -307,6 +296,13 @@ const WatchlistView = () => {
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
     console.log(watchlists);
+
+    const setWatchlistItems = (newItems) => {
+        console.log(newItems);
+        const newWatchlists = watchlists.slice();
+        newWatchlists[watchlistIndex].tickers = newItems;
+        setWatchlists(newWatchlists);
+    };
 
     return (
         <div
@@ -351,16 +347,13 @@ const WatchlistView = () => {
                                 orderBy={orderBy}
                                 onSelectAllClick={handleSelectAllClick}
                                 onRequestSort={handleRequestSort}
-                                // rowCount={watchlists[selectedWatchlist].tickers.length}
-                                headerCells={
-                                    watchlists[selectedWatchlist].columns
-                                }
+                                // rowCount={watchlists[watchlistIndex].tickers.length}
+                                headerCells={watchlists[watchlistIndex].columns}
                             />
-                            {watchlists[selectedWatchlist].columns.length >
-                                0 && (
+                            {watchlists[watchlistIndex].columns.length > 0 && (
                                 <TableBody>
                                     {stableSort(
-                                        watchlists[selectedWatchlist].tickers,
+                                        watchlists[watchlistIndex].tickers,
                                         getComparator(order, orderBy)
                                     ).map((row, index) => {
                                         const isItemSelected = isSelected(
@@ -394,7 +387,7 @@ const WatchlistView = () => {
                                                 </StyledTableCell>
 
                                                 {watchlists[
-                                                    selectedWatchlist
+                                                    watchlistIndex
                                                 ].columns.map((column, i) =>
                                                     i === 0 ? (
                                                         <StyledTableCell
@@ -428,23 +421,21 @@ const WatchlistView = () => {
                     Create a New Watchlist
                 </Button>
             )}
-            {/* {tickerModalOpen && (
-				<SearchTickerModal
-					watchlistID={watchlistID}
-					handleClose={handleTickerModalClose}
-					watchlistItems={watchlists[selectedWatchlist].tickers}
-					setWatchlistItems={setWatchlistItems}
-					columns={watchlists[selectedWatchlist].columns}
-				/>
-			)} */}
+            {tickerModalOpen && (
+                <SearchTickerModal
+                    handleClose={handleTickerModalClose}
+                    watchlistItems={watchlists[watchlistIndex].tickers}
+                    setWatchlistItems={setWatchlistItems}
+                />
+            )}
             {/* {editColumnsModalOpen && (
 				<EditColumnsModal
 					watchlistID={watchlistID}
 					open={editColumnsModalOpen}
 					handleClose={handleEditColumnsModalClose}
-					columns={watchlists[selectedWatchlist].columns}
+					columns={watchlists[watchlistIndex].columns}
 					setColumns={setColumns}
-					watchlistItems={watchlists[selectedWatchlist].tickers}
+					watchlistItems={watchlists[watchlistIndex].tickers}
 					setWatchlistItems={setWatchlistItems}
 				/>
 			)} */}
@@ -460,14 +451,14 @@ const WatchlistView = () => {
 			/> */}
             {watchlists.length ? (
                 <div>
-                    {watchlists[selectedWatchlist].tickers.length === 0 && (
+                    {watchlists[watchlistIndex].tickers.length === 0 && (
                         <div>
                             Your watchlist is empty, try adding some rows using
                             the button on the right of the toolbar
                         </div>
                     )}
-                    {watchlists[selectedWatchlist].columns.length === 0 &&
-                        watchlists[selectedWatchlist].tickers.length > 0 && (
+                    {watchlists[watchlistIndex].columns.length === 0 &&
+                        watchlists[watchlistIndex].tickers.length > 0 && (
                             <div>Try Adding some columns</div>
                         )}
                 </div>
