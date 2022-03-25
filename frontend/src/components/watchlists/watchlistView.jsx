@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 import SearchTickerModal from "components/modals/searchTickerModal";
-// import EditColumnsModal from "components/modals/editColumnsModal";
+import EditColumnsModal from "components/modals/editColumnsModal";
 // import WatchlistsPopover from "components/modals/watchlistsPopover";
 // import AddWatchlistModal from "components/modals/addWatchlistModal";
 
@@ -299,9 +299,14 @@ const WatchlistView = () => {
     console.log(watchlists);
 
     const setWatchlistItems = (newItems) => {
-        console.log(newItems);
         const newWatchlists = watchlists.slice();
         newWatchlists[watchlistIndex].tickers = newItems;
+        setWatchlists(newWatchlists);
+    };
+
+    const setColumns = (newColumns) => {
+        const newWatchlists = watchlists.slice();
+        newWatchlists[watchlistIndex].columns = newColumns;
         setWatchlists(newWatchlists);
     };
 
@@ -429,9 +434,8 @@ const WatchlistView = () => {
                     setWatchlistItems={setWatchlistItems}
                 />
             )}
-            {/* {editColumnsModalOpen && (
+            {editColumnsModalOpen && (
                 <EditColumnsModal
-                    watchlistID={watchlistID}
                     open={editColumnsModalOpen}
                     handleClose={handleEditColumnsModalClose}
                     columns={watchlists[watchlistIndex].columns}
@@ -439,7 +443,7 @@ const WatchlistView = () => {
                     watchlistItems={watchlists[watchlistIndex].tickers}
                     setWatchlistItems={setWatchlistItems}
                 />
-            )} */}
+            )}
             {/* <WatchlistsPopover
 				anchorEl={anchorEl}
 				handleClose={handlePopoverClose}

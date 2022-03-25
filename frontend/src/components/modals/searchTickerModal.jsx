@@ -247,13 +247,7 @@ const SearchTickerModal = (props) => {
                                                     item.ticker,
                                                     "ticker"
                                                 ) !== -1 && (
-                                                    <Check
-                                                        fontSize="medium"
-                                                        sx={{
-                                                            padding: "none",
-                                                            overflow: "visible",
-                                                        }}
-                                                    />
+                                                    <Check fontSize="medium" />
                                                 )}
                                             </Grid>
                                         </StyledGridItem>

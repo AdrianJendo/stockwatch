@@ -12,7 +12,6 @@ import { DoneAll } from "@mui/icons-material";
 
 const WatchlistTableHeader = (props) => {
     const {
-        classes,
         onSelectAllClick,
         order,
         orderBy,
@@ -21,6 +20,7 @@ const WatchlistTableHeader = (props) => {
         onRequestSort,
         headerCells,
     } = props;
+
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
@@ -60,7 +60,19 @@ const WatchlistTableHeader = (props) => {
                         >
                             {headerCell.label}
                             {orderBy === headerCell.id ? (
-                                <span className={classes.visuallyHidden}>
+                                <span
+                                    style={{
+                                        border: 0,
+                                        clip: "rect(0 0 0 0)",
+                                        height: 1,
+                                        margin: -1,
+                                        overflow: "hidden",
+                                        padding: 0,
+                                        position: "absolute",
+                                        top: 20,
+                                        width: 1,
+                                    }}
+                                >
                                     {order === "desc"
                                         ? "sorted descending"
                                         : "sorted ascending"}

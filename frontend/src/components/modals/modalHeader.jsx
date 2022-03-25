@@ -1,4 +1,4 @@
-import { IconButton, Typography, DialogTitle, styled } from "@mui/material";
+import { IconButton, DialogTitle, styled } from "@mui/material";
 import { Close } from "@mui/icons-material";
 
 const StyledMuiDialogTitle = styled(DialogTitle)(({ theme }) => ({
