@@ -14,6 +14,7 @@ import {
     TableRow,
     Paper,
     Button,
+    Typography,
     styled,
 } from "@mui/material";
 
@@ -313,6 +314,7 @@ const WatchlistView = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 width: "90%",
+                flexWrap: "wrap",
             }}
         >
             {watchlists.length > 0 ? (
@@ -347,7 +349,6 @@ const WatchlistView = () => {
                                 orderBy={orderBy}
                                 onSelectAllClick={handleSelectAllClick}
                                 onRequestSort={handleRequestSort}
-                                // rowCount={watchlists[watchlistIndex].tickers.length}
                                 headerCells={watchlists[watchlistIndex].columns}
                             />
                             {watchlists[watchlistIndex].columns.length > 0 && (
@@ -429,16 +430,16 @@ const WatchlistView = () => {
                 />
             )}
             {/* {editColumnsModalOpen && (
-				<EditColumnsModal
-					watchlistID={watchlistID}
-					open={editColumnsModalOpen}
-					handleClose={handleEditColumnsModalClose}
-					columns={watchlists[watchlistIndex].columns}
-					setColumns={setColumns}
-					watchlistItems={watchlists[watchlistIndex].tickers}
-					setWatchlistItems={setWatchlistItems}
-				/>
-			)} */}
+                <EditColumnsModal
+                    watchlistID={watchlistID}
+                    open={editColumnsModalOpen}
+                    handleClose={handleEditColumnsModalClose}
+                    columns={watchlists[watchlistIndex].columns}
+                    setColumns={setColumns}
+                    watchlistItems={watchlists[watchlistIndex].tickers}
+                    setWatchlistItems={setWatchlistItems}
+                />
+            )} */}
             {/* <WatchlistsPopover
 				anchorEl={anchorEl}
 				handleClose={handlePopoverClose}
@@ -452,14 +453,16 @@ const WatchlistView = () => {
             {watchlists.length ? (
                 <div>
                     {watchlists[watchlistIndex].tickers.length === 0 && (
-                        <div>
+                        <Typography sx={{ padding: "20px" }}>
                             Your watchlist is empty, try adding some rows using
                             the button on the right of the toolbar
-                        </div>
+                        </Typography>
                     )}
                     {watchlists[watchlistIndex].columns.length === 0 &&
                         watchlists[watchlistIndex].tickers.length > 0 && (
-                            <div>Try Adding some columns</div>
+                            <Typography sx={{ padding: "20px" }}>
+                                Try Adding some columns
+                            </Typography>
                         )}
                 </div>
             ) : undefined}
