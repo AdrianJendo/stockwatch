@@ -10,6 +10,8 @@ import pandas as pd
 finnhub_url = os.environ.get("finnhub_url")
 api_key = os.environ.get("finnhub_key")
 
+# NO LONGER USEFUL
+
 # /fundamentals/:ticker
 class RESTFundamentalData(Resource):
     def get(self, ticker):

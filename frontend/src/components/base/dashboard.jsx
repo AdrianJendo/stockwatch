@@ -35,9 +35,10 @@ import {
 
 // components
 import MUISwitch from "components/base/muiSwitch";
-import Heatmap from "components/heatmap";
-import Comparisons from "components/comparisons/comparisons";
 import MarketOverview from "components/marketOverview/marketOverview";
+import Watchlists from "components/watchlists/watchlistView";
+import Heatmap from "components/heatmap/heatmap";
+import Comparisons from "components/comparisons/comparisons";
 import TechnicalAnalysis from "components/technicalAnalysis/technicalAnalysis";
 import About from "components/about/about";
 import Crypto from "components/crypto/crypto";
@@ -316,7 +317,12 @@ export default function PersistentDrawerLeft(props) {
             <Main open={open}>
                 <DrawerHeader />
 
-                <div style={{ height: "calc(100vh - 64px - 40px)" }}>
+                <div
+                    style={{
+                        height: "calc(100vh - 64px - 40px)",
+                        overflow: "hidden",
+                    }}
+                >
                     <Router>
                         <Routes>
                             <Route
@@ -325,7 +331,7 @@ export default function PersistentDrawerLeft(props) {
                             />
                             <Route
                                 path="/watchlists"
-                                element={<Typography>Watchlists</Typography>}
+                                element={<Watchlists />}
                             />
                             <Route
                                 path="/heatmap"

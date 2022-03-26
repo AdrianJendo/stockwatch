@@ -8,6 +8,8 @@ import random
 from models.user import User
 from models.watchlist import Watchlist
 
+# NO LONGER USEFUL
+
 
 def watchlists_to_json(watchlists):
     return [
@@ -91,12 +93,11 @@ watchlists = [
 ]
 
 
-# Let user set defaults columns for new watchlists
-
 # /watchlists
 class RESTWatchlists(Resource):
     def get(self):
         user = User.objects.first()
+        return watchlists
         return watchlists_to_json(user.watchlists)
 
     def post(self):

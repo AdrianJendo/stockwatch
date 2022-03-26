@@ -5,11 +5,11 @@ import os
 from dotenv import load_dotenv, find_dotenv
 from flask_cors import CORS
 
-from api import dev
+from api_useless import dev
 from api import comparisons
 from api import heatmap
-from api import priceHistory
-from api import fundamentals
+from api import price_history
+from api_useless import fundamentals
 
 # dotenv
 load_dotenv(find_dotenv())
@@ -41,7 +41,7 @@ api.add_resource(heatmap.RESTHeatmap, "/heatmap")
 api.add_resource(dev.RESTUsers, "/users")
 
 # price history graph
-api.add_resource(priceHistory.RESTPriceHistory, "/ticker/<ticker>")
+api.add_resource(price_history.RESTPriceHistory, "/ticker/<ticker>")
 
 # fundamental data
 api.add_resource(fundamentals.RESTFundamentalData, "/fundamentals/<ticker>")
