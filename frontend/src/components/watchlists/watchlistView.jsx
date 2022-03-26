@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 // import axios from "axios";
 import SearchTickerModal from "components/modals/searchTickerModal";
 import EditColumnsModal from "components/modals/editColumnsModal";
-// import WatchlistsPopover from "components/modals/watchlistsPopover";
-// import AddWatchlistModal from "components/modals/addWatchlistModal";
+import WatchlistsPopover from "components/modals/watchlistsPopover";
 
 import {
     Table,
@@ -39,21 +38,6 @@ const defaultColumns = [
         label: "Category",
     },
 ];
-
-// const headCells = [
-// 	{
-// 		id: "marketCap",
-// 		numeric: true,
-// 		disablePadding: false,
-// 		label: "Market Cap (USD)",
-// 	},
-// 	{
-// 		id: "dailyPercent",
-// 		numeric: true,
-// 		disablePadding: false,
-// 		label: "Daily % Change",
-// 	},
-// ];
 
 // const rows = [
 // 	{
@@ -261,6 +245,9 @@ const WatchlistView = () => {
                 newWatchlistItems.push(watchlists[watchlistIndex].tickers[i]);
             }
         }
+        setSelected([]);
+        const newWatchlists = watchlists.slice();
+        newWatchlists[watchlistIndex].tickers = newWatchlistItems;
 
         // axios
         //     .put(`/api/watchlists/${watchlistID}`, {
@@ -423,16 +410,14 @@ const WatchlistView = () => {
                     setWatchlistItems={setWatchlistItems}
                 />
             )}
-            {/* <WatchlistsPopover
-				anchorEl={anchorEl}
-				handleClose={handlePopoverClose}
-				setWatchlistItems={setWatchlistItems}
-				watchlists={watchlists}
-				setWatchlists={setWatchlists}
-				setColumns={setColumns}
-				selectedID={watchlistID}
-				setSelectedID={setWatchlistID}
-			/> */}
+            <WatchlistsPopover
+                anchorEl={anchorEl}
+                handleClose={handlePopoverClose}
+                setWatchlistItems={setWatchlistItems}
+                watchlists={watchlists}
+                setWatchlists={setWatchlists}
+                setColumns={setColumns}
+            />
             {watchlists.length ? (
                 <div>
                     {watchlists[watchlistIndex].tickers.length === 0 && (

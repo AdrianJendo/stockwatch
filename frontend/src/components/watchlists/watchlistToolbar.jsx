@@ -11,11 +11,6 @@ import {
 } from "@mui/material";
 import { RotateLeft, Add, Delete, Create, Menu } from "@mui/icons-material";
 
-const StyledToolbar = styled(Toolbar)(({ theme }) => ({
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1),
-}));
-
 const StyledToolbarText = styled(Typography)(({ theme }) => ({
     fontSize: "14px",
     marginLeft: "5px",
@@ -47,7 +42,7 @@ const WatchlistTableToolbar = (props) => {
     };
 
     return (
-        <StyledToolbar>
+        <Toolbar>
             <Tooltip title="Watchlists" placement="left-start">
                 <IconButton
                     aria-label="watchlists"
@@ -121,7 +116,7 @@ const WatchlistTableToolbar = (props) => {
                     </StyledToolbarText>
                 </IconButton>
             </Tooltip>
-        </StyledToolbar>
+        </Toolbar>
     );
 };
 
