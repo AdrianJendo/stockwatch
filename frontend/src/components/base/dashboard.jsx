@@ -40,6 +40,7 @@ import Watchlists from "components/watchlists/watchlistView";
 import Heatmap from "components/heatmap/heatmap";
 import Comparisons from "components/comparisons/comparisons";
 import TechnicalAnalysis from "components/technicalAnalysis/technicalAnalysis";
+import FundamentalAnalysis from "components/fundamentalAnalysis/fundamentalAnalysis";
 import About from "components/about/about";
 import Crypto from "components/crypto/crypto";
 
@@ -351,9 +352,7 @@ export default function PersistentDrawerLeft(props) {
                             <Route
                                 path="/fundamental"
                                 element={
-                                    <Typography>
-                                        Fundamental Analysis
-                                    </Typography>
+                                    <FundamentalAnalysis theme={colorTheme} />
                                 }
                             />
                             <Route path="/about" element={<About />} />
