@@ -9,7 +9,7 @@ from api_useless import dev
 from api import comparisons
 from api import heatmap
 from api import price_history
-from api_useless import fundamentals
+from api import fundamentals
 
 # dotenv
 load_dotenv(find_dotenv())

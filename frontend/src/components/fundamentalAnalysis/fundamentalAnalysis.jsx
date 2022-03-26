@@ -15,7 +15,7 @@ const FundamentalAnalysis = (props) => {
                 display: "flex",
                 flexWrap: "wrap",
                 overflow: "none",
-                // justifyContent: "space-between",
+                justifyContent: "center",
             }}
         >
             <div style={{ padding: "20px" }}>
