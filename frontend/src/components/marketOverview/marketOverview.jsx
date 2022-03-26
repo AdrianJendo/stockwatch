@@ -17,6 +17,7 @@ const MarketOverview = (props) => {
                 display: "flex",
                 flexWrap: "wrap",
                 overflow: "none",
+                padding: "5px",
             }}
         >
             <div style={{ width: "50%", height: "100%" }}>
