@@ -3,7 +3,6 @@ from flask_restful import Resource
 from datetime import date, timedelta
 import requests
 import json
-import pdb
 import os
 import pandas as pd
 
