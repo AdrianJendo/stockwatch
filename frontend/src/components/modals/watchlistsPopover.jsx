@@ -10,7 +10,7 @@ import {
     ListItemText,
     styled,
 } from "@mui/material";
-import { Settings, Add } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import { RadioButtonUnchecked, RadioButtonChecked } from "@mui/icons-material";
 import { useState } from "react";
 
@@ -36,12 +36,12 @@ const WatchlistsPopover = (props) => {
     const {
         anchorEl,
         handleClose,
-        setWatchlistItems,
+        // setWatchlistItems,
         watchlists,
         setWatchlists,
-        setColumns,
+        // setColumns,
         selectedID,
-        setSelectedID,
+        // setSelectedID,
     } = props;
     const open = anchorEl !== null;
 
@@ -89,9 +89,9 @@ const WatchlistsPopover = (props) => {
         setEditWatchlistsModalOpen(false);
     };
 
-    const handleEditWatchlistModalOpen = () => {
-        setEditWatchlistsModalOpen(true);
-    };
+    // const handleEditWatchlistModalOpen = () => {
+    //     setEditWatchlistsModalOpen(true);
+    // };
 
     return (
         <Popover

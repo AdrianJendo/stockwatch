@@ -12,7 +12,13 @@ import { Search } from "@mui/icons-material";
 import ModalHeader from "components/modals/modalHeader";
 
 const AddWatchlistModal = (props) => {
-    const { open, handleClose, watchlists, setWatchlists, selectedID } = props;
+    const {
+        open,
+        handleClose,
+        watchlists,
+        selectedID,
+        //setWatchlists
+    } = props;
     const [searchValue, setSearchValue] = useState("");
 
     const closeAddWatchlistModal = (id) => {
