@@ -12,7 +12,7 @@ const TickerGraph = (props) => {
     let { ticker } = useParams();
     const [stockInfo, setStockInfo] = useState(null);
 
-    const lookUpData = async (interval, ticker) =>
+    const lookupPriceData = async (interval, ticker) =>
         axios
             .get(`/api/ticker/${ticker}`, {
                 params: {
@@ -49,13 +49,12 @@ const TickerGraph = (props) => {
             });
 
     useEffect(() => {
-        const fuck = async () => {
-            lookUpData("1Y", ticker).then((resp) => {
+        const lookupAllData = async () => {
+            lookupPriceData("1Y", ticker).then((resp) => {
                 lookUpFinancialData(ticker).then((finStatements) => {
                     if (resp !== null && finStatements !== null) {
                         let dilutedShares = 0;
                         let netIncome = 0;
-                        console.log(finStatements);
                         finStatements[new Date().getFullYear() - 1].ic.forEach(
                             (entry) => {
                                 if (
@@ -89,8 +88,6 @@ const TickerGraph = (props) => {
                             ).toFixed(2)}M`;
                         }
 
-                        console.log("MADE IT");
-
                         setStockInfo({
                             avgVolume: resp.supData.avg_volume,
                             highPrice52: resp.supData.high_price_52,
@@ -110,7 +107,7 @@ const TickerGraph = (props) => {
             });
         };
 
-        fuck();
+        lookupAllData();
     }, [ticker]);
 
     return (
