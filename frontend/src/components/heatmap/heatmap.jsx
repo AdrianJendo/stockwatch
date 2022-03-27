@@ -9,7 +9,8 @@ import { getTreemap } from "treemap-squarify";
 
 const heatmapWidth = 1500;
 const heatmapHeight = 800;
-
+const sectorCorrector = 14;
+const subSectorCorrector = 12;
 // TODO
 // Add dropdown to app bar to choose index
 
@@ -87,7 +88,12 @@ const Heatmap = (props) => {
             const sectorDimensions = {};
             sectorTreemap.forEach((sector) => {
                 const { data, height, width, x, y } = sector;
-                sectorDimensions[data.label] = { height, width, x, y };
+                sectorDimensions[data.label] = {
+                    height: height - sectorCorrector,
+                    width,
+                    x,
+                    y,
+                };
             });
 
             // populate sub sector weights for getTreemap function if exist
@@ -108,7 +114,7 @@ const Heatmap = (props) => {
                     subSectorTreemaps[sector].forEach((subSector) => {
                         const { data, height, width, x, y } = subSector;
                         subSectorDimensions[data.label] = {
-                            height,
+                            height: height - subSectorCorrector,
                             width,
                             x,
                             y,
@@ -155,8 +161,8 @@ const Heatmap = (props) => {
                     <g key={sector.data.label}>
                         <svg
                             x={sector.x}
-                            y={sector.y + 14}
-                            height={sector.height - 14}
+                            y={sector.y + sectorCorrector}
+                            height={sector.height - sectorCorrector}
                             width={sector.width}
                         >
                             {subSectorTreemaps !== null
@@ -165,8 +171,14 @@ const Heatmap = (props) => {
                                           <g key={subSector.data.label}>
                                               <svg
                                                   x={subSector.x}
-                                                  y={subSector.y + 12}
-                                                  height={subSector.height - 12}
+                                                  y={
+                                                      subSector.y +
+                                                      subSectorCorrector
+                                                  }
+                                                  height={
+                                                      subSector.height -
+                                                      subSectorCorrector
+                                                  }
                                               >
                                                   {stockTreemaps[
                                                       subSector.data.label
@@ -216,6 +228,40 @@ const Heatmap = (props) => {
                                                               fill="white"
                                                           >
                                                               {stock.data.label}
+                                                          </text>
+                                                          <text
+                                                              style={{
+                                                                  position:
+                                                                      "relative",
+                                                                  dominantBaseline:
+                                                                      "middle",
+                                                                  textAnchor:
+                                                                      "middle",
+                                                                  cursor: "default",
+                                                                  userSelect:
+                                                                      "none",
+                                                                  fontSize:
+                                                                      "10px",
+                                                              }}
+                                                              x={
+                                                                  stock.x +
+                                                                  stock.width /
+                                                                      2
+                                                              }
+                                                              y={
+                                                                  stock.y +
+                                                                  stock.height /
+                                                                      2 +
+                                                                  16
+                                                              }
+                                                              fill="white"
+                                                          >
+                                                              {
+                                                                  stock.data[
+                                                                      "% Chg"
+                                                                  ]
+                                                              }
+                                                              %
                                                           </text>
                                                       </g>
                                                   ))}
