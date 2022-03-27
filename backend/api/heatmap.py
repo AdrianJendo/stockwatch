@@ -107,13 +107,16 @@ class RESTHeatmap(Resource):
             df.loc[df["Symbol"] == stock["ticker"], "SubSector"] = stock["sub_sector"]
             if stock["sector"] not in sectors:
                 sectors[stock["sector"]] = 0
-            if stock["sub_sector"] not in sub_sectors:
-                sub_sectors[stock["sub_sector"]] = 0
+                sub_sectors[
+                    stock["sector"]
+                ] = {}  # also need to keep track of each sub_sector for given sector
+            if stock["sub_sector"] not in sub_sectors[stock["sector"]]:
+                sub_sectors[stock["sector"]][stock["sub_sector"]] = 0
 
             sectors[stock["sector"]] += df.loc[
                 df["Symbol"] == stock["ticker"], "Weight"
             ].values[0]
-            sub_sectors[stock["sub_sector"]] += df.loc[
+            sub_sectors[stock["sector"]][stock["sub_sector"]] += df.loc[
                 df["Symbol"] == stock["ticker"], "Weight"
             ].values[0]
 
