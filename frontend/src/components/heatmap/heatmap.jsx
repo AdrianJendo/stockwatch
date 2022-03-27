@@ -153,14 +153,20 @@ const Heatmap = (props) => {
             <svg width={heatmapWidth} height={heatmapHeight}>
                 {sectorTreemap.map((sector) => (
                     <g key={sector.data.label}>
-                        <svg x={sector.x} y={sector.y}>
+                        <svg
+                            x={sector.x}
+                            y={sector.y + 14}
+                            height={sector.height - 14}
+                            width={sector.width}
+                        >
                             {subSectorTreemaps !== null
                                 ? subSectorTreemaps[sector.data.label].map(
                                       (subSector) => (
                                           <g key={subSector.data.label}>
                                               <svg
                                                   x={subSector.x}
-                                                  y={subSector.y}
+                                                  y={subSector.y + 12}
+                                                  height={subSector.height - 12}
                                               >
                                                   {stockTreemaps[
                                                       subSector.data.label
@@ -214,6 +220,28 @@ const Heatmap = (props) => {
                                                       </g>
                                                   ))}
                                               </svg>
+                                              <svg
+                                                  width={subSector.width}
+                                                  x={subSector.x}
+                                                  y={subSector.y}
+                                                  height="12"
+                                              >
+                                                  <text
+                                                      style={{
+                                                          dominantBaseline:
+                                                              "middle",
+                                                          textAnchor: "middle",
+                                                          cursor: "default",
+                                                          userSelect: "none",
+                                                          fontSize: "8px",
+                                                      }}
+                                                      x={subSector.width / 2}
+                                                      y="8"
+                                                      fill="white"
+                                                  >
+                                                      {subSector.data.label}
+                                                  </text>
+                                              </svg>
                                           </g>
                                       )
                                   )
@@ -229,6 +257,8 @@ const Heatmap = (props) => {
                                                   y={stock.y}
                                                   width={stock.width}
                                                   height={stock.height}
+                                                  strokeWidth="1"
+                                                  stroke="black"
                                               ></rect>
                                               <text
                                                   style={{
@@ -250,21 +280,27 @@ const Heatmap = (props) => {
                                       )
                                   )}
                         </svg>
-                        <text
-                            style={{
-                                position: "relative",
-                                dominantBaseline: "middle",
-                                textAnchor: "middle",
-                                cursor: "default",
-                                userSelect: "none",
-                                fontSize: "14px",
-                            }}
-                            x={sector.x + sector.width / 2}
-                            y={sector.y + 14}
-                            fill="white"
+                        <svg
+                            width={sector.width}
+                            x={sector.x}
+                            y={sector.y}
+                            height="16"
                         >
-                            {sector.data.label}
-                        </text>
+                            <text
+                                style={{
+                                    dominantBaseline: "middle",
+                                    textAnchor: "middle",
+                                    cursor: "default",
+                                    userSelect: "none",
+                                    fontSize: "12px",
+                                }}
+                                x={sector.width / 2}
+                                y="8"
+                                fill="white"
+                            >
+                                {sector.data.label}
+                            </text>
+                        </svg>
                     </g>
                 ))}
                 Sorry, your browser does not support inline SVG.
