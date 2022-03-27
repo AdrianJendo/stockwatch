@@ -118,7 +118,7 @@ class RESTHeatmap(Resource):
             ].values[0]
 
         return {
-            "df": df.to_json(orient="records"),
+            "stocks": df.to_json(orient="records"),
             "sectors": json.dumps(sectors),
             "sub_sectors": json.dumps(sub_sectors),
         }

@@ -9,7 +9,7 @@ import Masonry from "@mui/lab/Masonry";
 import { getTreemap } from "treemap-squarify";
 
 const heatmapWidth = 1500;
-const heatmapHeight = 900;
+const heatmapHeight = 800;
 
 const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
@@ -18,85 +18,122 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const Heatmap = (props) => {
-    const [stocks, setStocks] = useState({});
-    const [sectors, setSectors] = useState([]);
-    const [sortedSectors, setSortedSectors] = useState([]);
-    const [numCols, setNumCols] = useState(0);
+    // const [stocks, setStocks] = useState({});
+    // const [sectors, setSectors] = useState([]);
+    // const [sortedSectors, setSortedSectors] = useState([]);
+    // const [numCols, setNumCols] = useState(0);
 
-    const [treeMap, setTreeMap] = useState([]);
+    const [sectorTreeMap, setSectorTreeMap] = useState([]);
+    const [stockTreeMaps, setStockTreeMaps] = useState({});
 
     const { index } = props;
 
     useEffect(() => {
-        // const getIndexWeights = async () => {
-        //     // You can await here
-        //     const response = await axios.get("/api/heatmap", {
-        //         params: {
-        //             index,
-        //         },
-        //     });
+        const getIndexTreeMap = async () => {
+            const heatmapResponse = await axios.get("/api/heatmap", {
+                params: {
+                    index,
+                },
+            });
 
-        //     const data = response.data;
-        //     const sectors = JSON.parse(data.sectors);
-        //     const stocksData = JSON.parse(data.df);
-        //     // Calculate height, width, number of columns
-        //     const maxSectorWeight = Object.values(sectors).reduce(
-        //         (prev, cur) => Math.max(prev, cur),
-        //         0
-        //     );
-        //     Object.keys(sectors).forEach((sector) => {
-        //         sectors[sector] /= maxSectorWeight;
-        //     });
-        //     const sortedSectors = Object.keys(sectors).sort(
-        //         (a, b) => sectors[b] - sectors[a]
-        //     );
-        //     const stocks = {};
-        //     stocksData.forEach((stock) => {
-        //         if (!stocks[stock.Sector]) {
-        //             stocks[stock.Sector] = [];
-        //         }
-        //         stocks[stock.Sector].push(stock);
-        //     });
-        //     setStocks(stocks);
-        //     setSortedSectors(sortedSectors);
-        //     setSectors(sectors);
-        //     setNumCols(index === "sp500" ? 4 : index === "dowjones" ? 7 : 3);
-        // };
-        // getIndexWeights();
-        const newTreeMap = getTreemap({
-            data: [
-                // your dataset
-                { value: 23, color: "#1B277C", label: "23" },
-                { value: 20, color: "#2C5A9C", label: "20" },
-                { value: 19, color: "#3984B6", label: "19" },
-                { value: 14, color: "#3F97C2", label: "14" },
-                { value: 9, color: "#78C6D0", label: "9" },
-                { value: 8, color: "#AADACC", label: "8" },
-                { value: 7, color: "#DCECC9", label: "7" },
-            ],
-            width: heatmapWidth, // the width and height of your treemap
-            height: heatmapHeight,
-        });
-        setTreeMap(newTreeMap);
-    }, [index, setStocks]);
+            const data = heatmapResponse.data;
+            const stocks = JSON.parse(data.stocks);
+            const sectors = JSON.parse(data.sectors);
+
+            const stocksBySector = {}; // dictionary sorting stocks into their sectors
+            stocks.forEach((stock, index) => {
+                // need stocks separated by sector to calculat colour and brightness of each sector
+                if (!stocksBySector[stock.Sector]) {
+                    stocksBySector[stock.Sector] = [];
+                }
+                stocksBySector[stock.Sector].push({
+                    ["% Chg"]: stock["% Chg"],
+                    Weight: stock["Weight"],
+                    label: stock.Symbol,
+                    value: stock.Weight,
+                    color: stock.Chg >= 0 ? "green" : "red",
+                    brightness: Math.min(
+                        Math.max(Math.abs(stock["% Chg"] * 8), 0.7),
+                        1.8
+                    ),
+                    index,
+                    sector: stock.Sector,
+                });
+
+                // console.log(
+                //     stock["% Chg"],
+                //     Math.min(Math.max(Math.abs(stock["% Chg"] * 8), 0.7), 1.8)
+                // );
+            });
+
+            const sectorData = Object.keys(sectors).map((sector) => {
+                // remove "industry" from sector if it exists
+                // const industryIndex = sector.indexOf("industry");
+                let sectorLabel = sector;
+                // if (industryIndex > 0) {
+                //     sectorLabel = sector.substring(0, industryIndex);
+                // }
+                const sectorPercentChange = stocksBySector[sector].reduce(
+                    (prev, cur) => (prev += cur["% Chg"] * cur["Weight"]),
+                    0
+                );
+
+                return {
+                    label: sectorLabel,
+                    value: sectors[sector],
+                    color: sectorPercentChange >= 0 ? "green" : "red",
+                    brightness: Math.min(
+                        Math.max(Math.abs(sectorPercentChange) * 2, 0.75),
+                        1.25
+                    ),
+                };
+            });
+
+            const sectorTreeMap = getTreemap({
+                data: sectorData,
+                width: heatmapWidth, // the width and height of your treemap
+                height: heatmapHeight,
+            });
+            const sectorDimensions = {};
+            sectorTreeMap.forEach((sector) => {
+                const { data, height, width, x, y } = sector;
+                sectorDimensions[data.label] = { height, width, x, y };
+            });
+            const stockTreeMaps = {};
+            Object.keys(stocksBySector).forEach((sector) => {
+                // console.log(sectorDimensions[sector]);
+                stockTreeMaps[sector] = getTreemap({
+                    data: stocksBySector[sector],
+                    width: sectorDimensions[sector].width,
+                    height: sectorDimensions[sector].height,
+                });
+            });
+            console.log(sectorTreeMap);
+            console.log(stockTreeMaps);
+            setSectorTreeMap(sectorTreeMap);
+            setStockTreeMaps(stockTreeMaps);
+        };
+        getIndexTreeMap();
+    }, []);
 
     // TODO
     // Add dropdown to app bar to choose index
-
-    console.log(treeMap);
 
     return (
         <Box
             sx={{
                 padding: "20px",
                 height: "100%",
+                display: "flex",
+                justifyContent: "center",
             }}
         >
             <svg width={heatmapWidth} height={heatmapHeight}>
-                {treeMap.map((rectangle) => (
+                {sectorTreeMap.map((rectangle) => (
                     <g
                         key={`${rectangle.x}:${rectangle.y}`}
                         fill={`${rectangle.data.color}`}
+                        filter={`brightness(${rectangle.data.brightness})`}
                     >
                         <rect
                             x={rectangle.x}
@@ -111,6 +148,7 @@ const Heatmap = (props) => {
                                 textAnchor: "middle",
                                 cursor: "default",
                                 userSelect: "none",
+                                fontSize: "10px",
                             }}
                             x={rectangle.x + rectangle.width / 2}
                             y={rectangle.y + rectangle.height / 2}
@@ -134,38 +172,11 @@ const Heatmap = (props) => {
     //     >
     //         <Masonry sx={{ height: "100%" }} columns={numCols} spacing={1}>
     //             {sortedSectors.map((sector) => (
-    //                 <Item
-    //                     key={sector}
-    //                     sx={{
-    //                         position: "relative",
-    //                         height: `${sectors[sector] * 100}%`,
-    //                         backgroundColor:
-    //                             stocks[sector].reduce(
-    //                                 (prev, cur) =>
-    //                                     (prev += cur["% Chg"] * cur["Weight"]),
-    //                                 0
-    //                             ) > 0
-    //                                 ? "green"
-    //                                 : "red",
-    //                         filter: `brightness(${Math.min(
-    //                             Math.max(
-    //                                 stocks[sector].reduce(
-    //                                     (prev, cur) =>
-    //                                         (prev +=
-    //                                             cur["% Chg"] *
-    //                                             cur["Weight"] *
-    //                                             100),
-    //                                     0
-    //                                 ),
-    //                                 70
-    //                             ),
-    //                             100
-    //                         )}%)`,
-    //                     }}
-    //                 >
+    //
     //                     <Typography variant="caption" sx={{ height: "10px" }}>
     //                         {sector}
     //                     </Typography>
+
     //                     <div
     //                         style={{
     //                             display: "flex",
