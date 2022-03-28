@@ -16,6 +16,8 @@ import {
     ListItemIcon,
     Link,
     ListItemText,
+    Select,
+    MenuItem,
 } from "@mui/material";
 import {
     Dashboard,
@@ -97,6 +99,7 @@ export default function PersistentDrawerLeft(props) {
     const { dark, setDark } = props;
     const theme = useTheme();
     const [open, setOpen] = React.useState(true);
+    const [selectedIndex, setSelectedIndex] = React.useState("sp500");
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -141,6 +144,29 @@ export default function PersistentDrawerLeft(props) {
                                 </Typography>
                             </Link>
                             <TickerSearch />
+                            {window.location.href.includes("heatmap") && (
+                                <Select
+                                    value={selectedIndex}
+                                    label="Index"
+                                    onChange={(e) =>
+                                        setSelectedIndex(e.target.value)
+                                    }
+                                    sx={{
+                                        margin: "auto",
+                                        height: "32px",
+                                    }}
+                                >
+                                    <MenuItem value={"sp500"}>
+                                        {"S&P 500"}
+                                    </MenuItem>
+                                    <MenuItem value={"nasdaq100"}>
+                                        NASDAQ 100
+                                    </MenuItem>
+                                    <MenuItem value={"dowjones"}>
+                                        Dow Jones
+                                    </MenuItem>
+                                </Select>
+                            )}
                         </div>
                         <MUISwitch defaultChecked toggleSwitch={toggleSwitch} />
                     </Toolbar>
@@ -285,7 +311,9 @@ export default function PersistentDrawerLeft(props) {
                             />
                             <Route
                                 path="/heatmap"
-                                element={<Heatmap index="dowjones" />}
+                                element={
+                                    <Heatmap selectedIndex={selectedIndex} />
+                                }
                             />
                             <Route
                                 path="/comparisons"

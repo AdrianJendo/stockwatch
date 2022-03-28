@@ -17,14 +17,14 @@ const Heatmap = (props) => {
     const [subSectorTreemaps, setSubSectorTreemaps] = useState(null);
     const [mousePos, setMousePos] = useState(null);
 
-    const { index } = props;
+    const { selectedIndex } = props;
 
     useEffect(() => {
         const getIndexTreemap = async () => {
             // get heatmap data from backend
             const heatmapResponse = await axios.get("/api/heatmap", {
                 params: {
-                    index,
+                    index: selectedIndex,
                 },
             });
 
@@ -145,7 +145,7 @@ const Heatmap = (props) => {
             setStockTreemaps({});
             setSubSectorTreemaps(null);
         };
-    }, [index]);
+    }, [selectedIndex]);
 
     const updateMousePos = (e, sector, subSector, stock) => {
         setMousePos({
@@ -433,8 +433,9 @@ const Heatmap = (props) => {
                             strokeWidth="0.5px"
                             fontSize="28px"
                         >
-                            {mousePos.stock.company}{" "}
-                            <tspan fontSize="16">
+                            {mousePos.stock.company}
+                            {"  "}
+                            <tspan fontSize="18px">
                                 ({mousePos.stock.label})
                             </tspan>
                         </text>
