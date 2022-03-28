@@ -15,6 +15,7 @@ const Heatmap = (props) => {
     const [sectorTreemap, setSectorTreemap] = useState([]);
     const [stockTreemaps, setStockTreemaps] = useState({});
     const [subSectorTreemaps, setSubSectorTreemaps] = useState(null);
+    const [mousePos, setMousePos] = useState(null);
 
     const { index } = props;
 
@@ -51,9 +52,11 @@ const Heatmap = (props) => {
                     stocksBySector[key] = [];
                 }
                 stocksBySector[key].push({
-                    ["% Chg"]: stock["% Chg"],
-                    Weight: stock["Weight"],
+                    pctChg: stock["% Chg"],
+                    chg: stock.Chg,
+                    price: stock.Price,
                     label: stock.Symbol,
+                    company: stock.Company,
                     value: stock.Weight,
                     color: stock.Chg >= 0 ? "green" : "red",
                     brightness: Math.min(
@@ -144,6 +147,20 @@ const Heatmap = (props) => {
         };
     }, [index]);
 
+    const updateMousePos = (e, sector, subSector, stock) => {
+        setMousePos({
+            x: e.nativeEvent.offsetX,
+            y: e.nativeEvent.offsetY,
+            sector,
+            subSector,
+            stock,
+        });
+    };
+
+    const clearMousePos = () => {
+        setMousePos(null);
+    };
+
     return (
         <Box
             sx={{
@@ -153,7 +170,11 @@ const Heatmap = (props) => {
                 justifyContent: "center",
             }}
         >
-            <svg width={heatmapWidth} height={heatmapHeight}>
+            <svg
+                width={heatmapWidth}
+                height={heatmapHeight}
+                onMouseLeave={() => clearMousePos}
+            >
                 <rect
                     width={heatmapWidth}
                     height={heatmapHeight}
@@ -196,6 +217,20 @@ const Heatmap = (props) => {
                                                               }
                                                               strokeWidth="1"
                                                               stroke="black"
+                                                              onMouseMove={(
+                                                                  e
+                                                              ) =>
+                                                                  updateMousePos(
+                                                                      e,
+                                                                      sector
+                                                                          .data
+                                                                          .label,
+                                                                      subSector
+                                                                          .data
+                                                                          .label,
+                                                                      stock.data
+                                                                  )
+                                                              }
                                                           ></rect>
 
                                                           <text
@@ -254,9 +289,8 @@ const Heatmap = (props) => {
                                                               fill="white"
                                                           >
                                                               {
-                                                                  stock.data[
-                                                                      "% Chg"
-                                                                  ]
+                                                                  stock.data
+                                                                      .pctChg
                                                               }
                                                               %
                                                           </text>
@@ -280,6 +314,14 @@ const Heatmap = (props) => {
                                                   height={stock.height}
                                                   strokeWidth="1"
                                                   stroke="black"
+                                                  onMouseMove={(e) =>
+                                                      updateMousePos(
+                                                          e,
+                                                          sector.data.label,
+                                                          null,
+                                                          stock.data
+                                                      )
+                                                  }
                                               ></rect>
                                               <text
                                                   style={{
@@ -325,29 +367,100 @@ const Heatmap = (props) => {
                     </g>
                 ))}
                 Sorry, your browser does not support inline SVG.
-                {/* {true && (
-                    <g>
+                {mousePos && (
+                    <svg
+                        x={
+                            mousePos.x > heatmapWidth / 2
+                                ? mousePos.x - 550
+                                : mousePos.x + 50
+                        }
+                        y={
+                            mousePos.y > heatmapHeight / 2
+                                ? mousePos.y - 250
+                                : mousePos.y + 50
+                        }
+                        width="500"
+                        height="200"
+                    >
                         <rect
-                            className="node animation-node"
-                            x="30"
-                            y="40"
+                            x="0"
+                            y="0"
+                            width="500"
+                            height="50"
+                            fill="#D3D3D3"
+                        ></rect>
+                        <rect
+                            x="0"
+                            y="50"
+                            width="500"
+                            height="150"
+                            fill={mousePos.stock.color}
+                            filter={`brightness(${mousePos.stock.brightness})`}
+                        ></rect>
+                        <rect
+                            x="0"
+                            y="0"
                             width="500"
                             height="200"
-                            fill="black"
+                            stroke="black"
+                            strokeWidth="8"
+                            fillOpacity="0"
                         ></rect>
-
                         <text
-                            x="30"
-                            y="40"
+                            x="50%"
+                            y="24px"
+                            dominantBaseline="middle"
                             textAnchor="middle"
-                            stroke="white"
+                            stroke="black"
                             strokeWidth="0.5px"
-                            alignmentBaseline="middle"
+                            fontSize="14px"
                         >
-                            "Sweaty Balls"
+                            {mousePos.sector}
+                            {mousePos.subSector && ` - ${mousePos.subSector}`}
                         </text>
-                    </g>
-                )} */}
+                        <line
+                            x1="0"
+                            y1="50"
+                            x2="500"
+                            y2="50"
+                            stroke="black"
+                            strokeWidth="4"
+                        />
+                        <text
+                            x="10"
+                            y="45%"
+                            stroke="black"
+                            strokeWidth="0.5px"
+                            fontSize="28px"
+                        >
+                            {mousePos.stock.company}{" "}
+                            <tspan fontSize="16">
+                                ({mousePos.stock.label})
+                            </tspan>
+                        </text>
+                        <text
+                            x="10"
+                            y="70%"
+                            stroke="black"
+                            strokeWidth="0.5px"
+                            fontSize="24px"
+                        >
+                            ${mousePos.stock.price}
+                        </text>
+                        <text
+                            x="50%"
+                            y="70%"
+                            textAnchor="middle"
+                            stroke="black"
+                            strokeWidth="0.5px"
+                            fontSize="24px"
+                        >
+                            {mousePos.stock.chg >= 0 ? "+" : "-"}$
+                            {Math.abs(mousePos.stock.chg)} (
+                            {mousePos.stock.pctChg}%)
+                        </text>
+                    </svg>
+                )}
             </svg>
         </Box>
     );
