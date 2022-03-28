@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-import { Box, Paper, styled } from "@mui/material";
+import { Box } from "@mui/material";
 
 // Article https://medium.com/@clementb/building-a-treemap-with-javascript-4d789ad43a85
 // Package from https://github.com/clementbat/treemap
@@ -10,9 +10,6 @@ import { getTreemap } from "treemap-squarify";
 const heatmapWidth = 1500;
 const heatmapHeight = 800;
 const sectorCorrector = 14;
-const subSectorCorrector = 12;
-// TODO
-// Add dropdown to app bar to choose index
 
 const Heatmap = (props) => {
     const [sectorTreemap, setSectorTreemap] = useState([]);
@@ -114,7 +111,7 @@ const Heatmap = (props) => {
                     subSectorTreemaps[sector].forEach((subSector) => {
                         const { data, height, width, x, y } = subSector;
                         subSectorDimensions[data.label] = {
-                            height: height - subSectorCorrector,
+                            height,
                             width,
                             x,
                             y,
@@ -139,13 +136,13 @@ const Heatmap = (props) => {
             setSubSectorTreemaps(subSectorTreemaps);
             setSectorTreemap(sectorTreemap);
         };
-        setSectorTreemap([]);
-        setStockTreemaps({});
-        setSubSectorTreemaps(null);
         getIndexTreemap();
+        return () => {
+            setSectorTreemap([]);
+            setStockTreemaps({});
+            setSubSectorTreemaps(null);
+        };
     }, [index]);
-
-    console.log(sectorTreemap, stockTreemaps);
 
     return (
         <Box
@@ -157,12 +154,18 @@ const Heatmap = (props) => {
             }}
         >
             <svg width={heatmapWidth} height={heatmapHeight}>
+                <rect
+                    width={heatmapWidth}
+                    height={heatmapHeight}
+                    strokeWidth="1"
+                    stroke="black"
+                ></rect>
                 {sectorTreemap.map((sector) => (
                     <g key={sector.data.label}>
                         <svg
                             x={sector.x}
                             y={sector.y + sectorCorrector}
-                            height={sector.height - sectorCorrector}
+                            height={sector.height}
                             width={sector.width}
                         >
                             {subSectorTreemaps !== null
@@ -171,14 +174,8 @@ const Heatmap = (props) => {
                                           <g key={subSector.data.label}>
                                               <svg
                                                   x={subSector.x}
-                                                  y={
-                                                      subSector.y +
-                                                      subSectorCorrector
-                                                  }
-                                                  height={
-                                                      subSector.height -
-                                                      subSectorCorrector
-                                                  }
+                                                  y={subSector.y}
+                                                  height={subSector.height}
                                               >
                                                   {stockTreemaps[
                                                       subSector.data.label
@@ -266,28 +263,6 @@ const Heatmap = (props) => {
                                                       </g>
                                                   ))}
                                               </svg>
-                                              <svg
-                                                  width={subSector.width}
-                                                  x={subSector.x}
-                                                  y={subSector.y}
-                                                  height="12"
-                                              >
-                                                  <text
-                                                      style={{
-                                                          dominantBaseline:
-                                                              "middle",
-                                                          textAnchor: "middle",
-                                                          cursor: "default",
-                                                          userSelect: "none",
-                                                          fontSize: "8px",
-                                                      }}
-                                                      x={subSector.width / 2}
-                                                      y="8"
-                                                      fill="white"
-                                                  >
-                                                      {subSector.data.label}
-                                                  </text>
-                                              </svg>
                                           </g>
                                       )
                                   )
@@ -350,6 +325,29 @@ const Heatmap = (props) => {
                     </g>
                 ))}
                 Sorry, your browser does not support inline SVG.
+                {/* {true && (
+                    <g>
+                        <rect
+                            className="node animation-node"
+                            x="30"
+                            y="40"
+                            width="500"
+                            height="200"
+                            fill="black"
+                        ></rect>
+
+                        <text
+                            x="30"
+                            y="40"
+                            textAnchor="middle"
+                            stroke="white"
+                            strokeWidth="0.5px"
+                            alignmentBaseline="middle"
+                        >
+                            "Sweaty Balls"
+                        </text>
+                    </g>
+                )} */}
             </svg>
         </Box>
     );
