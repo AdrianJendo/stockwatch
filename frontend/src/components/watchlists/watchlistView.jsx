@@ -24,6 +24,8 @@ import {
     stableSort,
 } from "components/watchlists/watchlistHelpers";
 
+// !! COMBINE finaincialmodellingprep and alpha vantage to build this out !!!!!!!!!
+
 const defaultColumns = [
     {
         id: "name",
