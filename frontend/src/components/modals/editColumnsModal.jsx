@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
+import axios from "axios";
 // import DragDropList from "components/dragDrop/dragDropList.jsx";
 import DialogTitle from "components/modals/modalHeader.jsx";
 import findIndex from "components/helpers/findIndex.js";
@@ -49,11 +49,17 @@ const StyledColumnTitle = styled(Typography)(() => ({
 }));
 
 const EditColumnsModal = (props) => {
-    const { handleClose, columns, setColumns } = props;
+    const {
+        handleClose,
+        columns,
+        setColumns,
+        watchlistItems,
+        setWatchlistItems,
+    } = props;
 
     const [searchValue, setSearchValue] = useState(""); // search value at top
-    const [dataCategory, setDataCategory] = useState("");
-    const [subCategory, setSubCategory] = useState(""); //
+    const [dataCategory, setDataCategory] = useState(""); // different sections with subCategories nested under them
+    const [subCategory, setSubCategory] = useState(""); // different categories of columns
     const [columnChoices, setColumnChoices] = useState([]); // search results / columns options
     const [selectedColumns, setSelectedColumns] = useState([]); // currently selected columns
 
@@ -108,30 +114,46 @@ const EditColumnsModal = (props) => {
         );
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        const curColumns = new Set(columns.map((column) => column.id));
+
         // lookup data for new columns
-        // // axios
-        // // 	.put(`/api/columns/${watchlistID}`, {
-        // // 		data: selectedColumns,
-        // // 	})
-        // // 	.then(() =>
-        // // 		axios
-        // // 			.get("/api/newcolumndata", {
-        // // 				params: {
-        // // 					columns: JSON.stringify(selectedColumns),
-        // // 					tickers: JSON.stringify(watchlistItems),
-        // // 				},
-        // // 			})
-        // // 			.then((res) => {
-        // // 				const newWatchlistItems = res.data.slice();
-        // // 				setWatchlistItems(newWatchlistItems);
-        // // 				setColumns(selectedColumns);
-        // // 				handleClose();
-        // // 			})
-        // // 			.catch((err) => alert(err.message))
-        // // 	)
-        // // 	.catch((err) => alert(err.message));
-        setColumns(selectedColumns);
+        const newColumns = selectedColumns.reduce((newCols, column) => {
+            if (!curColumns.has(column.id)) {
+                newCols.push(column);
+            }
+            return newCols;
+        }, []);
+
+        const lookupFields = newColumns.reduce((curFields, curColumn) => {
+            if (!curFields.has(curColumn.apiField)) {
+                curFields.add(curColumn.apiField);
+            }
+            return curFields;
+        }, new Set([]));
+
+        // get data for new columns
+        if (newColumns.length) {
+            const columnDataResp = await axios.get("/api/watchlists/columns", {
+                params: {
+                    tickers: JSON.stringify(watchlistItems),
+                    lookup_fields: JSON.stringify([...lookupFields]),
+                },
+            });
+
+            const columnData = columnDataResp.data;
+
+            const newWatchlistItems = watchlistItems.slice();
+            newWatchlistItems.forEach((item) => {
+                newColumns.forEach((column) => {
+                    item[column.id] = columnData[item.ticker][column.id];
+                });
+            });
+
+            setWatchlistItems(newWatchlistItems);
+            setColumns(selectedColumns);
+        }
+
         handleClose();
     };
 

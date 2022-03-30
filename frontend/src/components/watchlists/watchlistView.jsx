@@ -264,7 +264,7 @@ const WatchlistView = () => {
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
-    console.log(watchlists);
+    // console.log(watchlists);
 
     const setWatchlistItems = (newItems) => {
         const newWatchlists = watchlists.slice();

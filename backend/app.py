@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv, find_dotenv
 from flask_cors import CORS
 
-from api_useless import dev
+from api import watchlists
 from api import comparisons
 from api import heatmap
 from api import price_history
@@ -25,11 +25,10 @@ api_bp = Blueprint("api", __name__)
 api = Api(api_bp)
 
 # Routes
-# watchlist
-api.add_resource(dev.RESTWatchlists, "/watchlists")
-api.add_resource(dev.RESTWatchlist, "/watchlists/<watchlist_id>")
-api.add_resource(dev.RESTNewColumnData, "/newcolumndata")
-api.add_resource(dev.RESTWatchlistColumns, "/columns/<watchlist_id>")
+# watchlists
+# api.add_resource(watchlists.RESTWatchlists, "/watchlists")
+api.add_resource(watchlists.RESTWatchlistColumns, "/watchlists/columns")
+# api.add_resource(watchlists.RESTNewColumnData, "/newcolumndata")
 
 # comparisons
 api.add_resource(comparisons.RESTComparisons, "/comparisons")
@@ -38,7 +37,7 @@ api.add_resource(comparisons.RESTComparisons, "/comparisons")
 api.add_resource(heatmap.RESTHeatmap, "/heatmap")
 
 # users
-api.add_resource(dev.RESTUsers, "/users")
+# api.add_resource(dev.RESTUsers, "/users")
 
 # price history graph
 api.add_resource(price_history.RESTPriceHistory, "/ticker/<ticker>")

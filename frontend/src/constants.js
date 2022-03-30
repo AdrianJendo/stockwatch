@@ -100,37 +100,116 @@ export const watchlistColumns = {
         data: {
             income_statement_data: {
                 label: "Income Statement",
+
                 data: [
-                    { id: "ebitda", label: "EBITDA" },
-                    { id: "revenue", label: "Revenue" },
-                    { id: "net_income", label: "Net income" },
-                    { id: "shares_outstanding", label: "Shares outstanding" },
-                    { id: "operating_income", label: "Operating income" },
-                    { id: "cost_of_revenue", label: "Cost of revenue" },
-                    { id: "gross_profit", label: "Gross profit" },
-                    { id: "rd_expense", label: "R&D expense" },
                     {
-                        id: "sales_marketing_expense",
-                        label: "Sales and marketing expense",
+                        apiField: "INCOME_STATEMENT",
+                        id: "grossProfit",
+                        label: "Gross Profit",
                     },
-                    { id: "investment_income", label: "Investment income" },
                     {
-                        id: "stock_based_comp_income",
-                        label: "Stock based comp",
+                        apiField: "INCOME_STATEMENT",
+                        id: "totalRevenue",
+                        label: "Total Revenue",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "costOfRevenue",
+                        label: "Cost of Revenue",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "operatingIncome",
+                        label: "Operating Income",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "sellingGeneralAndAdministrative",
+                        label: "Selling, G & A",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "researchAndDevelopment",
+                        label: "R&D Costs",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "operatingExpenses",
+                        label: "Operating Expenses",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "investmentIncomeNet",
+                        label: "Investment Income",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "interestIncome",
+                        label: "Interest Income",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "interestExpense",
+                        label: "Interest Expense",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "nonInterestIncome",
+                        label: "Other Income",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "depreciationAndAmortization",
+                        label: "Depreciation & Amortization",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "incomeBeforeTax",
+                        label: "Income before income tax",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "incomeTaxExpense",
+                        label: "Income tax expense",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "interestAndDebtExpense",
+                        label: "Interest expense",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "netIncomeFromContinuingOperations",
+                        label: "Income from continued operations",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "ebit",
+                        label: "EBIT",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "ebitda",
+                        label: "EBITDA",
+                    },
+                    {
+                        apiField: "INCOME_STATEMENT",
+                        id: "netIncome",
+                        label: "Net income",
                     },
                 ],
             },
-            income_statement_ratios: {
-                label: "Ratios",
-                data: [
-                    { id: "gross_margin", label: "Gross margin" },
-                    { id: "net_margin", label: "Net margin" },
-                    { id: "operating_margin", label: "Operating Margin" },
-                    { id: "ebitda_margin", label: "EBITDA margin" },
-                    { id: "basic_eps", label: "Basic EPS" },
-                    { id: "diluted_eps", label: "Diluted EPS" },
-                ],
-            },
+            // income_statement_ratios: {
+            //     label: "Ratios",
+            //     data: [
+            //         { id: "gross_margin", label: "Gross margin" },
+            //         { id: "net_margin", label: "Net margin" },
+            //         { id: "operating_margin", label: "Operating Margin" },
+            //         { id: "ebitda_margin", label: "EBITDA margin" },
+            //         { id: "basic_eps", label: "Basic EPS" },
+            //         { id: "diluted_eps", label: "Diluted EPS" },
+            //     ],
+            // },
         },
     },
     balance_sheet: {
