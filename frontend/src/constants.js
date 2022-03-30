@@ -63,10 +63,8 @@ export const watchlistColumns = {
                         label: "Dividend $/share",
                     },
                     { id: "buyback_yield", label: "Buyback Yield" }, // don't work
-                    { id: "shares_outstanding", label: "Shares outstanding" },
                 ],
             },
-            // some of these work
             valuation_ratios: {
                 label: "Valuation Ratios",
                 data: [
@@ -97,11 +95,6 @@ export const watchlistColumns = {
                     },
                     {
                         apiField: "OVERVIEW",
-                        id: "DilutedEPSTTM",
-                        label: "Earnings per Share",
-                    },
-                    {
-                        apiField: "OVERVIEW",
                         id: "PriceToSalesRatioTTM",
                         label: "Price / Sales",
                     },
@@ -112,8 +105,8 @@ export const watchlistColumns = {
                     },
                     { apiField: "OVERVIEW", id: "Beta", label: "Beta" },
 
-                    { id: "enterprise_value", label: "Enterprise value" },
-                    { id: "debt_to_earnings", label: "Debt / Earnings" },
+                    { id: "enterprise_value", label: "Enterprise value" }, // no work
+                    { id: "debt_to_earnings", label: "Debt / Earnings" }, // no work
                 ], //Use this for any ratios that require more than 1 sheet (ex: income statement and balance sheet)
             },
         },
@@ -135,6 +128,7 @@ export const watchlistColumns = {
                         id: "52WeekLow",
                         label: "52 week low",
                     },
+                    // WORK ON THESE
                     {
                         id: "price_above_52_week_low",
                         label: "Price below 52 week high",
@@ -164,6 +158,7 @@ export const watchlistColumns = {
 
             technical_indicators: {
                 label: "Technical Indicators",
+                // WORK ON THESE
                 data: [
                     { id: "sma", label: "SMA" },
                     { id: "ema", label: "EMA" },
@@ -284,7 +279,7 @@ export const watchlistColumns = {
             income_statement_ratios: {
                 label: "Ratios",
                 data: [
-                    { id: "gross_margin", label: "Gross margin" },
+                    { id: "gross_margin", label: "Gross margin" }, // don't work
                     {
                         apiField: "OVERVIEW",
                         id: "ProfitMargin",
@@ -295,9 +290,13 @@ export const watchlistColumns = {
                         id: "OperatingMarginTTM",
                         label: "Operating Margin",
                     },
-                    { id: "ebitda_margin", label: "EBITDA margin" },
-                    { id: "basic_eps", label: "Basic EPS" },
-                    { id: "diluted_eps", label: "Diluted EPS" },
+                    { id: "ebitda_margin", label: "EBITDA margin" }, // don't work
+                    { apiField: "OVERVIEW", id: "EPS", label: "Basic EPS" },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "DilutedEPSTTM",
+                        label: "Diluted EPS",
+                    },
                 ],
             },
         },
@@ -484,6 +483,7 @@ export const watchlistColumns = {
             // these don't work
             balance_sheet_ratios: {
                 label: "Ratios",
+                // none of these work
                 data: [
                     {
                         id: "equity_per_book_value",
@@ -583,6 +583,7 @@ export const watchlistColumns = {
             // these don't work
             cash_flow_ratios: {
                 label: "Ratios",
+                // don't work
                 data: [
                     {
                         id: "capex_per_operating_cash_flow",
