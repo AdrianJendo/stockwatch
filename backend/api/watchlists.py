@@ -32,7 +32,6 @@ class RESTWatchlistColumns(Resource):
                     "BALANCE_SHEET",
                     "CASH_FLOW",
                 ]:
-                    print(search_function, ticker, data)
                     data = data["annualReports"][0]
 
                 if ticker not in columnData:

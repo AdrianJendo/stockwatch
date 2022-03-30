@@ -8,12 +8,13 @@ export const watchlistColumns = {
             security_information: {
                 label: "Security Information",
                 data: [
-                    { id: "name", label: "Name" },
+                    { apiField: "OVERVIEW", id: "Name", label: "Name" },
                     { id: "ticker", label: "Ticker" },
                     { id: "category", label: "Category" },
-                    { id: "country", label: "Country" },
+                    { apiField: "OVERVIEW", id: "Country", label: "Country" },
                 ],
             },
+            // these don't work
             growth_rates: {
                 label: "Growth Rates",
                 data: [
@@ -30,26 +31,87 @@ export const watchlistColumns = {
             valuation: {
                 label: "Valuation Data",
                 data: [
-                    { id: "market_cap", label: "Market cap" },
-                    { id: "divident_yield", label: "Dividend Yield" },
-                    { id: "ex_divident_date", label: "Ex dividend date" },
-                    { id: "last_dividend_date", label: "Last dividend date" },
                     {
-                        id: "last_dividend_per_share",
-                        label: "Last dividend $/share",
+                        apiField: "OVERVIEW",
+                        id: "MarketCapitalization",
+                        label: "Market cap",
                     },
-                    { id: "buyback_yield", label: "Buyback Yield" },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "BookValue",
+                        label: "Book Value",
+                    },
+
+                    {
+                        apiField: "OVERVIEW",
+                        id: "DividendYield",
+                        label: "Dividend Yield",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "DividendDate",
+                        label: "Dividend date",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "ExDividendDate",
+                        label: "Last dividend date",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "DividendPerShare",
+                        label: "Dividend $/share",
+                    },
+                    { id: "buyback_yield", label: "Buyback Yield" }, // don't work
                     { id: "shares_outstanding", label: "Shares outstanding" },
                 ],
             },
+            // some of these work
             valuation_ratios: {
                 label: "Valuation Ratios",
                 data: [
-                    { id: "return_on_equity", label: "Return on equity" },
-                    { id: "return_on_assets", label: "Return on assets" },
-                    { id: "price_to_book", label: "Price / Book" },
-                    { id: "price_to_earnings", label: "Price / Earnings" },
-                    { id: "price_to_sales", label: "Price / Sales" },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "ReturnOnEquityTTM",
+                        label: "Return on equity",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "ReturnOnAssetsTTM",
+                        label: "Return on assets",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "PriceToBookRatio",
+                        label: "Price / Book",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "PERatio",
+                        label: "Price / Earnings",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "PEGRatio",
+                        label: "PEG Ratio",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "DilutedEPSTTM",
+                        label: "Earnings per Share",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "PriceToSalesRatioTTM",
+                        label: "Price / Sales",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "EVToEBITDA",
+                        label: "EV / EBITDA",
+                    },
+                    { apiField: "OVERVIEW", id: "Beta", label: "Beta" },
+
                     { id: "enterprise_value", label: "Enterprise value" },
                     { id: "debt_to_earnings", label: "Debt / Earnings" },
                 ], //Use this for any ratios that require more than 1 sheet (ex: income statement and balance sheet)
@@ -63,8 +125,16 @@ export const watchlistColumns = {
             price_and_performance: {
                 label: "Price & Performance",
                 data: [
-                    { id: "52_week_high", label: "52 week high" },
-                    { id: "52_week_low", label: "52 week low" },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "52WeekHigh",
+                        label: "52 week high",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "52WeekLow",
+                        label: "52 week low",
+                    },
                     {
                         id: "price_above_52_week_low",
                         label: "Price below 52 week high",
@@ -75,7 +145,19 @@ export const watchlistColumns = {
                     },
                     {
                         id: "YTD_return",
-                        label: "% return (YTD, 1year, 1month, etc.)",
+                        label: "YTD % Return",
+                    },
+                    {
+                        id: "annual_return",
+                        label: "Annual % Return",
+                    },
+                    {
+                        id: "month_return",
+                        label: "Monthly % Return",
+                    },
+                    {
+                        id: "day_return",
+                        label: "Daily % Return",
                     },
                 ],
             },
@@ -100,7 +182,6 @@ export const watchlistColumns = {
         data: {
             income_statement_data: {
                 label: "Income Statement",
-
                 data: [
                     {
                         apiField: "INCOME_STATEMENT",
@@ -195,21 +276,30 @@ export const watchlistColumns = {
                     {
                         apiField: "INCOME_STATEMENT",
                         id: "netIncome",
-                        label: "Net income",
+                        label: "Net Income",
                     },
                 ],
             },
-            // income_statement_ratios: {
-            //     label: "Ratios",
-            //     data: [
-            //         { id: "gross_margin", label: "Gross margin" },
-            //         { id: "net_margin", label: "Net margin" },
-            //         { id: "operating_margin", label: "Operating Margin" },
-            //         { id: "ebitda_margin", label: "EBITDA margin" },
-            //         { id: "basic_eps", label: "Basic EPS" },
-            //         { id: "diluted_eps", label: "Diluted EPS" },
-            //     ],
-            // },
+            // these don't work
+            income_statement_ratios: {
+                label: "Ratios",
+                data: [
+                    { id: "gross_margin", label: "Gross margin" },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "ProfitMargin",
+                        label: "Net margin",
+                    },
+                    {
+                        apiField: "OVERVIEW",
+                        id: "OperatingMarginTTM",
+                        label: "Operating Margin",
+                    },
+                    { id: "ebitda_margin", label: "EBITDA margin" },
+                    { id: "basic_eps", label: "Basic EPS" },
+                    { id: "diluted_eps", label: "Diluted EPS" },
+                ],
+            },
         },
     },
     balance_sheet: {
@@ -219,26 +309,179 @@ export const watchlistColumns = {
             balance_sheet_data: {
                 label: "Balance Sheet",
                 data: [
-                    { id: "inventory", label: "Inventory" },
-                    { id: "total_debt", label: "Total debt" },
-                    { id: "net_debt", label: "Net debt" },
-                    { id: "long_term_debt", label: "Long term debt" },
-                    { id: "short_term_debt", label: "Short term debt" },
-                    { id: "accounts_payable", label: "Accounts payable" },
-                    { id: "accounts_receivable", label: "Accounts receivable" },
-                    { id: "deferred_revenue", label: "Deferred Revenue" },
-                    { id: "intangible_assets", label: "Intangible assets" },
-                    { id: "goodwill", label: "Goodwill" },
                     {
-                        id: "intangible_assets_goodwill",
-                        label: "Intangible assets & goodwill",
+                        apiField: "BALANCE_SHEET",
+                        id: "totalAssets",
+                        label: "Total Assets",
                     },
                     {
-                        id: "cash_and_equivalents",
-                        label: "Cash and equivalents",
+                        apiField: "BALANCE_SHEET",
+                        id: "totalCurrentAssets",
+                        label: "Current Assets",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "cashAndCashEquivalentsAtCarryingValue",
+                        label: "Cash & Cash Equivalents",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "cashAndShortTermInvestments",
+                        label: "Short term investments",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "inventory",
+                        label: "Inventory",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "currentNetReceivables",
+                        label: "Current Net Receivables",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "totalNonCurrentAssets",
+                        label: "Total Non-current Assets",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "propertyPlantEquipment",
+                        label: "Property, Plant and Equipment",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "intangibleAssets",
+                        label: "Intangible Assets",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "intangibleAssetsExcludingGoodwill",
+                        label: "Intangible Assets without goodwill",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "goodwill",
+                        label: "Goodwill",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "investments",
+                        label: "Investments",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "longTermInvestments",
+                        label: "Long term investments",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "shortTermInvestments",
+                        label: "Short term investments",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "otherCurrentAssets",
+                        label: "Other Current Assets",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "otherNonCurrrentAssets",
+                        label: "Other Non-current Assets",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "totalLiabilities",
+                        label: "Total Liabilities",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "totalCurrentLiabilities",
+                        label: "Current Liabilities",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "currentAccountsPayable",
+                        label: "Current Accounts Payable",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "deferredRevenue",
+                        label: "Deferred Revenue",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "currentDebt",
+                        label: "Current Debt",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "shortTermDebt",
+                        label: "Short Term Debt",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "totalNonCurrentLiabilities",
+                        label: "Total Non-current Liabilities",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "capitalLeaseObligations",
+                        label: "Capital Lease Obligations",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "longTermDebt",
+                        label: "Long Term Debt",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "currentLongTermDebt",
+                        label: "Current Long Term Debt",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "longTermDebtNoncurrent",
+                        label: "Non-current Long Term Debt",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "otherCurrentLiabilities",
+                        label: "Other Current Liabilities",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "otherNonCurrentLiabilities",
+                        label: "Other Non-current Liabilities",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "totalShareholderEquity",
+                        label: "Total Shareholder Equity",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "treasuryStock",
+                        label: "Treasury Stock",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "retainedEarnings",
+                        label: "Retained Earnings",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "commonStock",
+                        label: "Common Stock",
+                    },
+                    {
+                        apiField: "BALANCE_SHEET",
+                        id: "commonStockSharesOutstanding",
+                        label: "Shares Outstanding",
                     },
                 ],
             },
+            // these don't work
             balance_sheet_ratios: {
                 label: "Ratios",
                 data: [
@@ -265,25 +508,79 @@ export const watchlistColumns = {
             cash_flow_data: {
                 label: "Cash Flow Data",
                 data: [
-                    { id: "operating_cash_flow", label: "Operating cash flow" },
                     {
-                        id: "cash_flow_from_financing_activities",
-                        label: "Cash flow from financing activities",
+                        apiField: "CASH_FLOW",
+                        id: "operatingCashflow",
+                        label: "Operating Cashflow",
                     },
                     {
-                        id: "cash_flow_from_investing_activities",
-                        label: "Cash flow from investing activies",
+                        apiField: "CASH_FLOW",
+                        id: "proceedsFromOperatingActivities",
+                        label: "Cashflow From Operating Activities",
                     },
-                    { id: "capex", label: "Capital expendtitures" },
                     {
-                        id: "stock_based_comp_cash_flow",
-                        label: "Stock based compensation",
+                        apiField: "CASH_FLOW",
+                        id: "depreciationDepletionAndAmortization",
+                        label: "Depreciation & Amortization",
                     },
-                    { id: "debt_raised", label: "Debt raised" },
-                    { id: "stock_buybacks", label: "Stock buybacks" },
-                    { id: "dividends_paid", label: "Dividends paid" },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "capitalExpenditures",
+                        label: "Capex",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "changeInReceivables",
+                        label: "Change in Receivables",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "changeInInventory",
+                        label: "Change in Inventory",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "cashflowFromInvestment",
+                        label: "Cashflow from Investment",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "cashflowFromFinancing",
+                        label: "Cashflow from Financing",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "proceedsFromRepaymentsOfShortTermDebt",
+                        label: "Proceeds from Repayments of Short Term Debt",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "paymentsForRepurchaseOfCommonStock",
+                        label: "Payments for Stock Repurchase",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "dividendPayout",
+                        label: "Dividends Paid",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "proceedsFromIssuanceOfCommonStock",
+                        label: "Proceeds from Issuance of Common Stock",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet",
+                        label: "Proceeds from Issuance of Long Term Debt",
+                    },
+                    {
+                        apiField: "CASH_FLOW",
+                        id: "changeInCashAndCashEquivalents",
+                        label: "Change in Cash & Cash Equivalents",
+                    },
                 ],
             },
+            // these don't work
             cash_flow_ratios: {
                 label: "Ratios",
                 data: [
