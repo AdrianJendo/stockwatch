@@ -103,7 +103,6 @@ export const watchlistColumns = {
                         id: "EVToEBITDA",
                         label: "EV / EBITDA",
                     },
-                    { apiField: "OVERVIEW", id: "Beta", label: "Beta" },
 
                     { id: "enterprise_value", label: "Enterprise value" }, // no work
                     { id: "debt_to_earnings", label: "Debt / Earnings" }, // no work
@@ -128,7 +127,7 @@ export const watchlistColumns = {
                         id: "52WeekLow",
                         label: "52 week low",
                     },
-                    // WORK ON THESE
+                    // THESE DON'T WORK
                     {
                         id: "price_above_52_week_low",
                         label: "Price below 52 week high",
@@ -160,13 +159,41 @@ export const watchlistColumns = {
                 label: "Technical Indicators",
                 // WORK ON THESE
                 data: [
-                    { id: "sma", label: "SMA" },
-                    { id: "ema", label: "EMA" },
-                    { id: "beta", label: "Beta" },
-                    { id: "volatility", label: "Volatility" },
+                    { apiField: "SMA", id: "sma50", label: "50 day SMA" },
+                    { apiField: "SMA", id: "sma100", label: "100 day SMA" },
+                    { apiField: "SMA", id: "sma200", label: "200 day SMA" },
+                    { apiField: "EMA", id: "ema50", label: "50 day EMA" },
+                    { apiField: "EMA", id: "ema100", label: "100 day EMA" },
+                    { apiField: "EMA", id: "ema200", label: "200 day EMA" },
+                    { apiField: "OVERVIEW", id: "Beta", label: "Beta" },
+                    // { id: "volatility", label: "Volatility" },
                     { id: "rsi", label: "RSI" },
-                    { id: "volume", label: "Volume" },
-                    { id: "short_interest", label: "short interest" },
+                    {
+                        apiField: "TIME_SERIES_MONTHLY_ADJUSTED",
+                        id: "1. open",
+                        label: "Open",
+                    },
+                    {
+                        apiField: "TIME_SERIES_MONTHLY_ADJUSTED",
+                        id: "2. high",
+                        label: "High",
+                    },
+                    {
+                        apiField: "TIME_SERIES_MONTHLY_ADJUSTED",
+                        id: "3. low",
+                        label: "Low",
+                    },
+                    {
+                        apiField: "TIME_SERIES_MONTHLY_ADJUSTED",
+                        id: "4. close",
+                        label: "Close",
+                    },
+                    {
+                        apiField: "TIME_SERIES_MONTHLY_ADJUSTED",
+                        id: "5. volume",
+                        label: "Volume",
+                    },
+                    // { id: "short_interest", label: "short interest" },
                 ],
             },
         },

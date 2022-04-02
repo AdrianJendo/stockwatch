@@ -12,27 +12,64 @@ class RESTWatchlistColumns(Resource):
     def get(self):
         tickers = json.loads(request.args.get("tickers", "null"))
         api_fields = json.loads(request.args.get("lookup_fields", "null"))
+        time_periods = json.loads(request.args.get("time_periods", "null"))
 
         columnData = {}
 
         for tickerObj in tickers:
             ticker = tickerObj["ticker"]
             for search_function in api_fields:
-                resp = requests.get(
-                    data_url,
-                    params={
-                        "function": search_function,
-                        "symbol": ticker,
-                        "apikey": api_key,
-                    },
-                )
-                data = resp.json()
-                if search_function in [
-                    "INCOME_STATEMENT",
-                    "BALANCE_SHEET",
-                    "CASH_FLOW",
-                ]:
-                    data = data["annualReports"][0]
+                if time_periods and (
+                    len(time_periods["SMA"]) or len(time_periods["EMA"])
+                ):
+                    data = {}
+                    for time_period in time_periods["SMA"]:
+                        resp = requests.get(
+                            data_url,
+                            params={
+                                "function": "SMA",
+                                "symbol": ticker,
+                                "apikey": api_key,
+                                "time_period": time_period,
+                                "interval": "daily",
+                                "series_type": "close",
+                            },
+                        )
+                        data["sma{}".format(time_period)] = list(
+                            resp.json()["Technical Analysis: SMA"].values()
+                        )[0]["SMA"]
+                    for time_period in time_periods["EMA"]:
+                        resp = requests.get(
+                            data_url,
+                            params={
+                                "function": "EMA",
+                                "symbol": ticker,
+                                "apikey": api_key,
+                                "time_period": time_period,
+                                "interval": "daily",
+                                "series_type": "close",
+                            },
+                        )
+                        data["ema{}".format(time_period)] = list(
+                            resp.json()["Technical Analysis: EMA"].values()
+                        )[0]["EMA"]
+                else:
+                    resp = requests.get(
+                        data_url,
+                        params={
+                            "function": search_function,
+                            "symbol": ticker,
+                            "apikey": api_key,
+                        },
+                    )
+                    if search_function in [
+                        "INCOME_STATEMENT",
+                        "BALANCE_SHEET",
+                        "CASH_FLOW",
+                    ]:
+                        data = resp.json()["annualReports"][0]
+                    elif search_function in ["TIME_SERIES_DAILY"]:
+                        data = resp.json()["Time Series (Daily)"].values()[0]
 
                 if ticker not in columnData:
                     columnData[ticker] = {}

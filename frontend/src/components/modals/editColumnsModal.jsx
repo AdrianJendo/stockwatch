@@ -134,10 +134,20 @@ const EditColumnsModal = (props) => {
 
         // get data for new columns
         if (newColumns.length) {
+            const timePeriods = { SMA: [], EMA: [] };
+            newColumns.forEach((item) => {
+                if (item.label.includes("SMA")) {
+                    timePeriods.SMA.push(parseInt(item.label.split(" ")[0]));
+                } else if (item.label.includes("EMA")) {
+                    timePeriods.EMA.push(parseInt(item.label.split(" ")[0]));
+                }
+            });
+
             const columnDataResp = await axios.get("/api/watchlists/columns", {
                 params: {
                     tickers: JSON.stringify(watchlistItems),
                     lookup_fields: JSON.stringify([...lookupFields]),
+                    time_periods: JSON.stringify(timePeriods),
                 },
             });
 
