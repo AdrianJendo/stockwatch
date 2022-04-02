@@ -157,7 +157,6 @@ export const watchlistColumns = {
 
             technical_indicators: {
                 label: "Technical Indicators",
-                // WORK ON THESE
                 data: [
                     { apiField: "SMA", id: "sma50", label: "50 day SMA" },
                     { apiField: "SMA", id: "sma100", label: "100 day SMA" },

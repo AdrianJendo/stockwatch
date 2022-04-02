@@ -16,8 +16,7 @@ class RESTWatchlistColumns(Resource):
 
         columnData = {}
 
-        for tickerObj in tickers:
-            ticker = tickerObj["ticker"]
+        for ticker in tickers:
             for search_function in api_fields:
                 if time_periods and (
                     len(time_periods["SMA"]) or len(time_periods["EMA"])

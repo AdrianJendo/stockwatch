@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
+import axios from "axios";
 import SearchTickerModal from "components/modals/searchTickerModal";
 import EditColumnsModal from "components/modals/editColumnsModal";
 import WatchlistsPopover from "components/modals/watchlistsPopover";
@@ -264,11 +264,75 @@ const WatchlistView = () => {
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
-    // console.log(watchlists);
-
     const setWatchlistItems = (newItems) => {
         const newWatchlists = watchlists.slice();
         newWatchlists[watchlistIndex].tickers = newItems;
+        setWatchlists(newWatchlists);
+    };
+
+    const setNewAssets = async (selectedAssets) => {
+        const columns = watchlists[watchlistIndex].columns;
+
+        const existingTickers = new Set(
+            watchlists[watchlistIndex].tickers.map((ticker) => ticker.ticker)
+        );
+        const newTickers = selectedAssets.reduce((curNewTickers, curTicker) => {
+            if (!existingTickers.has(curTicker.ticker)) {
+                curNewTickers.push(curTicker);
+            }
+            return curNewTickers;
+        }, []);
+
+        const newWatchlists = watchlists.slice();
+        if (newTickers.length) {
+            const timePeriods = { SMA: [], EMA: [] };
+            columns.forEach((item) => {
+                if (item.label.includes("SMA")) {
+                    timePeriods.SMA.push(parseInt(item.label.split(" ")[0]));
+                } else if (item.label.includes("EMA")) {
+                    timePeriods.EMA.push(parseInt(item.label.split(" ")[0]));
+                }
+            });
+
+            const lookupFields = columns.reduce((curFields, curColumn) => {
+                if (curColumn.apiField && !curFields.has(curColumn.apiField)) {
+                    curFields.add(curColumn.apiField);
+                }
+                return curFields;
+            }, new Set([]));
+
+            const columnDataResp = await axios.get("/api/watchlists/columns", {
+                params: {
+                    tickers: JSON.stringify(
+                        newTickers.map((ticker) => ticker.ticker)
+                    ),
+                    lookup_fields: JSON.stringify([...lookupFields]),
+                    time_periods: JSON.stringify(timePeriods),
+                },
+            });
+            newWatchlists[watchlistIndex].tickers = selectedAssets.map(
+                (ticker) => {
+                    if (
+                        newTickers.find(
+                            (newTicker) => newTicker.ticker === ticker.ticker
+                        )
+                    ) {
+                        columns.forEach((column) => {
+                            if (column.apiField) {
+                                ticker[column.id] =
+                                    columnDataResp.data[ticker.ticker][
+                                        column.id
+                                    ];
+                            }
+                        });
+                    }
+                    return ticker;
+                }
+            );
+        } else {
+            newWatchlists[watchlistIndex].tickers = selectedAssets;
+        }
+
         setWatchlists(newWatchlists);
     };
 
@@ -399,7 +463,7 @@ const WatchlistView = () => {
                 <SearchTickerModal
                     handleClose={handleTickerModalClose}
                     watchlistItems={watchlists[watchlistIndex].tickers}
-                    setWatchlistItems={setWatchlistItems}
+                    setNewAssets={setNewAssets}
                 />
             )}
             {editColumnsModalOpen && (

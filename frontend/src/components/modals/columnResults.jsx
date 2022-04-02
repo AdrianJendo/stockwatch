@@ -11,11 +11,7 @@ import { Check } from "@mui/icons-material";
 const ColumnResults = (props) => {
     const { column, selectedColumns, handleToggleFromSelection } = props;
     return (
-        <ListItem
-            button
-            onClick={() => handleToggleFromSelection(column)}
-            key={column.id}
-        >
+        <ListItem button onClick={() => handleToggleFromSelection(column)}>
             {findIndex(selectedColumns, column.label) !== -1 && (
                 <ListItemIcon>
                     <Check fontSize="medium" />

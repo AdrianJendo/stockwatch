@@ -146,7 +146,9 @@ const EditColumnsModal = (props) => {
 
             const columnDataResp = await axios.get("/api/watchlists/columns", {
                 params: {
-                    tickers: JSON.stringify(watchlistItems),
+                    tickers: JSON.stringify(
+                        watchlistItems.map((item) => item.ticker)
+                    ),
                     lookup_fields: JSON.stringify([...lookupFields]),
                     time_periods: JSON.stringify(timePeriods),
                 },
@@ -332,6 +334,7 @@ const EditColumnsModal = (props) => {
                                     subCategory
                                 ].data.map((column) => (
                                     <ColumnResults
+                                        key={column.id}
                                         column={column}
                                         selectedColumns={selectedColumns}
                                         handleToggleFromSelection={
@@ -342,6 +345,7 @@ const EditColumnsModal = (props) => {
                             {dataCategory === "search" &&
                                 columnChoices.map((column) => (
                                     <ColumnResults
+                                        key={column.id}
                                         column={column}
                                         selectedColumns={selectedColumns}
                                         handleToggleFromSelection={
