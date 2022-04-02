@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-// import DragDropList from "components/dragDrop/dragDropList.jsx";
-import DialogTitle from "components/modals/modalHeader.jsx";
+// import DragDropList from "components/dragDrop/dragDropList";
+import DialogTitle from "components/modals/modalHeader";
+import ColumnResults from "components/modals/columnResults";
 import findIndex from "components/helpers/findIndex.js";
 import { watchlistColumns } from "constants";
 
@@ -330,41 +331,23 @@ const EditColumnsModal = (props) => {
                                 watchlistColumns[dataCategory].data[
                                     subCategory
                                 ].data.map((column) => (
-                                    <ListItem
-                                        button
-                                        onClick={() =>
-                                            handleToggleFromSelection(column)
+                                    <ColumnResults
+                                        column={column}
+                                        selectedColumns={selectedColumns}
+                                        handleToggleFromSelection={
+                                            handleToggleFromSelection
                                         }
-                                        key={column.id}
-                                    >
-                                        {findIndex(
-                                            selectedColumns,
-                                            column.label
-                                        ) !== -1 && (
-                                            <ListItemIcon>
-                                                <Check fontSize="medium" />
-                                            </ListItemIcon>
-                                        )}
-                                        <ListItemText
-                                            disableTypography
-                                            secondary={
-                                                <Typography
-                                                    sx={
-                                                        findIndex(
-                                                            selectedColumns,
-                                                            column.label
-                                                        ) !== -1
-                                                            ? {
-                                                                  color: "green",
-                                                              }
-                                                            : {}
-                                                    }
-                                                >
-                                                    {column.label}
-                                                </Typography>
-                                            }
-                                        />
-                                    </ListItem>
+                                    />
+                                ))}
+                            {dataCategory === "search" &&
+                                columnChoices.map((column) => (
+                                    <ColumnResults
+                                        column={column}
+                                        selectedColumns={selectedColumns}
+                                        handleToggleFromSelection={
+                                            handleToggleFromSelection
+                                        }
+                                    />
                                 ))}
                         </List>
                     </StyledGrid>
