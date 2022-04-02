@@ -161,9 +161,9 @@ const EditColumnsModal = (props) => {
             });
 
             setWatchlistItems(newWatchlistItems);
-            setColumns(selectedColumns);
         }
 
+        setColumns(selectedColumns);
         handleClose();
     };
 

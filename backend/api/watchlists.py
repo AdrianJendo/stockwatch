@@ -53,6 +53,23 @@ class RESTWatchlistColumns(Resource):
                         data["ema{}".format(time_period)] = list(
                             resp.json()["Technical Analysis: EMA"].values()
                         )[0]["EMA"]
+                elif search_function == "RSI":
+                    resp = requests.get(
+                        data_url,
+                        params={
+                            "function": "RSI",
+                            "symbol": ticker,
+                            "apikey": api_key,
+                            "interval": "daily",
+                            "time_period": 10,
+                            "series_type": "close",
+                        },
+                    )
+                    data = {
+                        "rsi": list(resp.json()["Technical Analysis: RSI"].values())[0][
+                            "RSI"
+                        ]
+                    }
                 else:
                     resp = requests.get(
                         data_url,
@@ -70,6 +87,8 @@ class RESTWatchlistColumns(Resource):
                         data = resp.json()["annualReports"][0]
                     elif search_function in ["TIME_SERIES_DAILY"]:
                         data = resp.json()["Time Series (Daily)"].values()[0]
+                    else:
+                        data = resp.json()
 
                 if ticker not in columnData:
                     columnData[ticker] = {}

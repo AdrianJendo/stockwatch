@@ -167,7 +167,7 @@ export const watchlistColumns = {
                     { apiField: "EMA", id: "ema200", label: "200 day EMA" },
                     { apiField: "OVERVIEW", id: "Beta", label: "Beta" },
                     // { id: "volatility", label: "Volatility" },
-                    { id: "rsi", label: "RSI" },
+                    { apiField: "RSI", id: "rsi", label: "RSI" },
                     {
                         apiField: "TIME_SERIES_MONTHLY_ADJUSTED",
                         id: "1. open",
