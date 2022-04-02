@@ -44,42 +44,41 @@ const StyledColumnTitle = styled(Typography)(({ theme }) => ({
 
 // Use ticker as ID (ie: don't remove it even when not present in the table)
 const items = [
-    { name: "Tesla Inc.", ticker: "TSLA", tab: "equity" },
-    { name: "Apple Inc.", ticker: "AAPL", tab: "equity" },
-    { name: "Microsoft", ticker: "MSFT", tab: "equity" },
-    { name: "Salesforce", ticker: "CRM", tab: "equity" },
-    { name: "Google", ticker: "GOOGL", tab: "equity" },
-    { name: "AMD", ticker: "AMD", tab: "equity" },
-    { name: "Nvidia", ticker: "NVDA", tab: "equity" },
-    { name: "Caterpillar", ticker: "CAT", tab: "equity" },
-    { name: "Amazon.com", ticker: "AMZN", tab: "equity" },
-    { name: "Agilent Technlogies", ticker: "A", tab: "equity" },
-    { name: "Ark innovation ETF", ticker: "ARKK", tab: "etf" },
-    { name: "Ark next gen internet ETF", ticker: "ARKW", tab: "etf" },
-    { name: "US Dollars / Bitcoin", ticker: "USD/BTC", tab: "forex" },
-    { name: "US Dollars / Ethereum", ticker: "USD/ETH", tab: "forex" },
-    { name: "US Dollars / Cardano", ticker: "BTC/ETH", tab: "forex" },
-    { name: "Cardano / US Dollars", ticker: "ADA/USD", tab: "forex" },
-    { name: "Yeti", ticker: "YETI", tab: "equity" },
-    { name: "John Deere Inc.", ticker: "DE", tab: "equity" },
-    { name: "Take Two Interactive", ticker: "TTWO", tab: "equity" },
-    { name: "Coinbase Inc.", ticker: "COIN", tab: "equity" },
+    { name: "Tesla Inc.", ticker: "TSLA", category: "equity" },
+    { name: "Apple Inc.", ticker: "AAPL", category: "equity" },
+    { name: "Microsoft", ticker: "MSFT", category: "equity" },
+    { name: "Salesforce", ticker: "CRM", category: "equity" },
+    { name: "Google", ticker: "GOOGL", category: "equity" },
+    { name: "AMD", ticker: "AMD", category: "equity" },
+    { name: "Nvidia", ticker: "NVDA", category: "equity" },
+    { name: "Caterpillar", ticker: "CAT", category: "equity" },
+    { name: "Amazon.com", ticker: "AMZN", category: "equity" },
+    { name: "Agilent Technlogies", ticker: "A", category: "equity" },
+    { name: "Ark innovation ETF", ticker: "ARKK", category: "etf" },
+    { name: "Ark next gen internet ETF", ticker: "ARKW", category: "etf" },
+    { name: "US Dollars / Bitcoin", ticker: "USD/BTC", category: "forex" },
+    { name: "US Dollars / Ethereum", ticker: "USD/ETH", category: "forex" },
+    { name: "US Dollars / Cardano", ticker: "BTC/ETH", category: "forex" },
+    { name: "Cardano / US Dollars", ticker: "ADA/USD", category: "forex" },
+    { name: "Yeti", ticker: "YETI", category: "equity" },
+    { name: "John Deere Inc.", ticker: "DE", category: "equity" },
+    { name: "Take Two Interactive", ticker: "TTWO", category: "equity" },
+    { name: "Coinbase Inc.", ticker: "COIN", category: "equity" },
     {
         name: "US Dollars / Canadian Dollars",
         ticker: "USD/CAD",
-        tab: "forex",
+        category: "forex",
     },
 ]; // TEMP items
 
 const SearchTickerModal = (props) => {
-    const { watchlistItems, setWatchlistItems, handleClose } = props;
+    const { watchlistItems, setNewAssets, handleClose } = props;
     const [searchValue, setSearchValue] = useState("");
     const [selectedItems, setSelectedItems] = useState([]);
     const [tab, setTab] = useState("all");
 
     useEffect(() => {
-        const newSelectedItems = watchlistItems.slice();
-        setSelectedItems(newSelectedItems);
+        setSelectedItems(watchlistItems.slice());
 
         return () => {
             setSelectedItems([]);
@@ -91,7 +90,7 @@ const SearchTickerModal = (props) => {
     };
 
     const handleSave = () => {
-        setWatchlistItems(selectedItems);
+        setNewAssets(selectedItems);
         handleClose();
 
         // save items to db
@@ -114,7 +113,7 @@ const SearchTickerModal = (props) => {
         //                     newWatchlistItems[indexOrder[i]] = response[i];
         //                 }
 
-        //                 setWatchlistItems(newWatchlistItems);
+        //                 setNewAssets(newWatchlistItems);
         //                 handleClose();
         //             })
         //             .catch((err) => alert(err.message));
@@ -148,8 +147,6 @@ const SearchTickerModal = (props) => {
             (a, b) =>
                 a.ticker.indexOf(searchValue) - b.ticker.indexOf(searchValue)
         );
-
-    console.log(selectedItems);
 
     return (
         <div>
