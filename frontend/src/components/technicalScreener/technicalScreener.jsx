@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Box,
     InputLabel,
@@ -6,20 +6,27 @@ import {
     FormControl,
     Select,
     Button,
+    Typography,
 } from "@mui/material";
 import { technicalPatterns } from "constants";
+import axios from "axios";
 
 const TechnicalScreener = () => {
-    const [age, setAge] = React.useState("");
+    const [age, setAge] = useState("");
+    const [stocks, setStocks] = useState([]);
 
     const handleChange = (event) => {
         setAge(event.target.value);
     };
 
-    const submitPattern = () => {
+    const submitPattern = async () => {
         console.log(age);
         console.log(technicalPatterns);
-        // const data = axios.get()
+        const resp = await axios.get("/api/technical_screener", {
+            params: { pattern: "CDLENGULFING" },
+        });
+        console.log(resp);
+        setStocks(resp.data);
     };
 
     return (
@@ -41,6 +48,39 @@ const TechnicalScreener = () => {
             <Button onClick={() => submitPattern()} variant="contained">
                 Submit
             </Button>
+
+            <div style={{ overflow: "scroll", height: "70vh" }}>
+                {stocks.map((stock) => (
+                    <Box
+                        sx={{
+                            display: "flex",
+                            padding: "20px",
+                            alignItems: "center",
+                        }}
+                    >
+                        <img
+                            src={`https://finviz.com/chart.ashx?t=${stock.ticker}&ty=c&ta=1&p=d&s=l`}
+                        />
+
+                        <Typography
+                            sx={{
+                                margin: "auto 0px",
+                                marginLeft: "60px",
+                                padding: "30px",
+                                backgroundColor:
+                                    stock.sentiment === "bullish"
+                                        ? "green"
+                                        : "red",
+                                height: "24px",
+                                width: "100px",
+                                textAlign: "center",
+                            }}
+                        >
+                            {stock.sentiment}
+                        </Typography>
+                    </Box>
+                ))}
+            </div>
         </Box>
     );
 };
