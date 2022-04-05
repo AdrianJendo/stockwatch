@@ -3,13 +3,7 @@ from flask_mongoengine import MongoEngine
 from flask_restful import Api
 import os
 from dotenv import load_dotenv, find_dotenv
-from flask_cors import CORS
-
-from api import watchlists
-from api import comparisons
-from api import heatmap
-from api import price_history
-from api import fundamentals
+from flask_sqlalchemy import SQLAlchemy
 
 # dotenv
 load_dotenv(find_dotenv())
@@ -19,10 +13,24 @@ app = Flask(__name__)
 app.config["MONGODB_SETTINGS"] = {
     "host": os.environ.get("MONGO_URI"),
 }
-db = MongoEngine(app)
+mongo_db = MongoEngine(app)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("POSTGRES_URI")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+postgres_db = SQLAlchemy(app)
 
 api_bp = Blueprint("api", __name__)
 api = Api(api_bp)
+
+from api import (
+    watchlists,
+    comparisons,
+    heatmap,
+    price_history,
+    fundamentals,
+    technical_screener,
+)
 
 # Routes
 # watchlists
@@ -44,6 +52,9 @@ api.add_resource(price_history.RESTPriceHistory, "/ticker/<ticker>")
 
 # fundamental data
 api.add_resource(fundamentals.RESTFundamentalData, "/fundamentals/<ticker>")
+
+# technical screener
+api.add_resource(technical_screener.RESTTechnicaScreener, "/technical_screener")
 
 # Register Routes
 app.register_blueprint(api_bp, url_prefix="/api")

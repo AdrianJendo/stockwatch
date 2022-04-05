@@ -24,6 +24,7 @@ import {
     TrendingUp,
     CompareArrows,
     AttachMoney,
+    ScreenSearchDesktop,
     Menu,
     ChevronLeft,
     ChevronRight,
@@ -42,6 +43,7 @@ import TickerGraph from "components/tickerSearch/tickerGraph";
 import Heatmap from "components/heatmap/heatmap";
 import Comparisons from "components/comparisons/comparisons";
 import TechnicalAnalysis from "components/technicalAnalysis/technicalAnalysis";
+import TechnicalScreener from "components/technicalScreener/technicalScreener";
 import FundamentalAnalysis from "components/fundamentalAnalysis/fundamentalAnalysis";
 import About from "components/about/about";
 import Crypto from "components/crypto/crypto";
@@ -240,12 +242,17 @@ export default function PersistentDrawerLeft(props) {
                         {[
                             {
                                 text: "Technical Analysis",
-                                icon: <AttachMoney />,
+                                icon: <CandlestickChart />,
                                 link: "/technical",
                             },
                             {
+                                text: "Technical Screener",
+                                icon: <ScreenSearchDesktop />,
+                                link: "/technical_screener",
+                            },
+                            {
                                 text: "Fundamental Analysis",
-                                icon: <CandlestickChart />,
+                                icon: <AttachMoney />,
                                 link: "/fundamental",
                             },
                         ].map((item) => (
@@ -325,6 +332,10 @@ export default function PersistentDrawerLeft(props) {
                                 element={
                                     <TechnicalAnalysis theme={colorTheme} />
                                 }
+                            />
+                            <Route
+                                path="/technical_screener"
+                                element={<TechnicalScreener />}
                             />
                             <Route
                                 path="/fundamental"

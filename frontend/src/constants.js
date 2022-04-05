@@ -620,3 +620,5 @@ export const watchlistColumns = {
         },
     },
 };
+
+export const technicalPatterns = {};
