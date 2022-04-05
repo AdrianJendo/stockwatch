@@ -2,14 +2,11 @@ from flask import request
 from flask_restful import Resource
 import pandas as pd
 import requests
-import os
 import yfinance as yf
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import talib
 from bs4 import BeautifulSoup
-import numpy as np
-
 from app import postgres_db
 
 
@@ -35,6 +32,7 @@ class RESTTechnicaScreener(Resource):
         df = pd.read_html(str(stats))[0]
         sp500_tickers = list(df["Symbol"])
 
+        symbols_with_pattern = []
         for ticker in sp500_tickers:
             # 2. Update data once per week
             postgres_db.engine.execute(
@@ -113,12 +111,28 @@ class RESTTechnicaScreener(Resource):
             ticker_data = pd.read_sql_table(
                 ticker, postgres_db.engine, schema="sp500_companies"
             )
-            print(ticker_data)
 
-            return "Looked up"
-            # 5. Look for pattern with :
-            #   - pattern_function = getattr(talib, pattern)
-            #   - result = pattern_function(df["Open"], df["High"], df["Low"], df["Close"])
-            # 6.
+            if not ticker_data.empty:
+                pattern_function = getattr(talib, pattern)
 
-        return {"hello": "world"}
+                result = pattern_function(
+                    ticker_data["open"],
+                    ticker_data["high"],
+                    ticker_data["low"],
+                    ticker_data["close"],
+                )
+
+                pattern_today = result.tail(1).values[
+                    0
+                ]  # check if it detected a pattern today
+
+                if pattern_today > 0:
+                    symbols_with_pattern.append(
+                        {"ticker": ticker, "sentiment": "bullish"}
+                    )
+                elif pattern_today < 0:
+                    symbols_with_pattern.append(
+                        {"ticker": ticker, "sentiment": "bearish"}
+                    )
+
+        return symbols_with_pattern
