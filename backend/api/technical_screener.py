@@ -36,56 +36,35 @@ class RESTTechnicaScreener(Resource):
         sp500_tickers = list(df["Symbol"])
 
         for ticker in sp500_tickers:
-            # 2. lookup needed data from yfinance
-            today = datetime.today().strftime("%Y-%m-%d")
-            start_date = (datetime.now() - relativedelta(years=1)).strftime(
-                "%Y-%m-%d"
-            )  # start 1 year ago
+            # 2. lookup data from yfinance once per week
+            lookup_data = False
+            if lookup_data:
+                today = datetime.today().strftime("%Y-%m-%d")
+                start_date = (datetime.now() - relativedelta(years=1)).strftime(
+                    "%Y-%m-%d"
+                )  # start 1 year ago
 
-            # df processing
-            df = yf.download(ticker, start=start_date, end=today)
-            df = df.drop(columns="Close")
-            df = df.rename(
-                columns={
-                    "Open": "open",
-                    "High": "high",
-                    "Low": "low",
-                    "Adj Close": "close",
-                    "Volume": "volume",
-                },
-            )
-            df.index.names = ["date"]
-
-            # check if table exists
-            if ticker in existing_tables:
-                # append new data to start
-                ticker_table = pd.read_sql_table(
-                    ticker,
-                    postgres_db.engine,
-                    schema="sp500_companies",
+                # df processing
+                df = yf.download(ticker, start=start_date, end=today)
+                df = df.drop(columns="Close")
+                df = df.rename(
+                    columns={
+                        "Open": "open",
+                        "High": "high",
+                        "Low": "low",
+                        "Adj Close": "close",
+                        "Volume": "volume",
+                    },
                 )
-                first_date = ticker_table.iloc[-1]["date"]
-                ticker_table = df.loc[first_date:].iloc[1:]
+                df.index.names = ["date"]
 
-                insert_values = []
-                ticker_table.apply(
-                    lambda x: insert_values.append(
-                        str(tuple([x.name.strftime("%Y-%m-%d")] + x.tolist()))
-                    ),
-                    axis=1,
-                )
-
-                if len(insert_values):
-                    postgres_db.engine.execute(
-                        """
-                            INSERT INTO sp500_companies."{ticker}" (date, open, high, low, close, volume)
-                            VALUES
-                            {values}
-                        """.format(
-                            ticker=ticker, values=",".join(insert_values)
-                        )
+                postgres_db.engine.execute(
+                    """
+                        DROP TABLE sp500_companies."{ticker}"
+                    """.format(
+                        ticker=ticker
                     )
-            else:
+                )
                 df.to_sql(ticker, postgres_db.engine, schema="sp500_companies")
 
             # 4. read from database as dataframe
