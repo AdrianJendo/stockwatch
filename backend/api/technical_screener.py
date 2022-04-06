@@ -9,7 +9,6 @@ import talib
 from bs4 import BeautifulSoup
 from app import postgres_db
 
-
 wiki_search_url = "https://www.slickcharts.com/sp500"
 
 # /technical_screener
@@ -107,7 +106,7 @@ class RESTTechnicaScreener(Resource):
 
                 df.to_sql(ticker, postgres_db.engine, schema="sp500_companies")
 
-            # 4. read from database as dataframe
+            # 3. read from database as dataframe
             ticker_data = pd.read_sql_table(
                 ticker, postgres_db.engine, schema="sp500_companies"
             )

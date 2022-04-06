@@ -78,7 +78,6 @@ const TechnicalScreener = () => {
                             <img
                                 src={`https://finviz.com/chart.ashx?t=${stock.ticker}&ty=c&ta=1&p=d&s=l`}
                             />
-
                             <Typography
                                 sx={{
                                     margin: "auto",
