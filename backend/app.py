@@ -54,7 +54,7 @@ api.add_resource(price_history.RESTPriceHistory, "/ticker/<ticker>")
 api.add_resource(fundamentals.RESTFundamentalData, "/fundamentals/<ticker>")
 
 # technical screener
-api.add_resource(technical_screener.RESTTechnicaScreener, "/technical_screener")
+api.add_resource(technical_screener.RESTTechnicalScreener, "/technical_screener")
 
 # Register Routes
 app.register_blueprint(api_bp, url_prefix="/api")

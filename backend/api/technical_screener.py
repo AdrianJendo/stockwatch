@@ -12,7 +12,7 @@ from app import postgres_db
 wiki_search_url = "https://www.slickcharts.com/sp500"
 
 # /technical_screener
-class RESTTechnicaScreener(Resource):
+class RESTTechnicalScreener(Resource):
     def get(self):
         pattern = request.args.get("pattern", None)
 
@@ -36,9 +36,9 @@ class RESTTechnicaScreener(Resource):
             # 2. Update data once per week
             postgres_db.engine.execute(
                 """
-                    CREATE TABLE IF NOT EXISTS sp500_companies."last_update" (
-                        date DATE NOT NULL
-                    )
+                CREATE TABLE IF NOT EXISTS sp500_companies."last_update" (
+                    date DATE NOT NULL
+                )
                 """
             )
 
@@ -52,8 +52,8 @@ class RESTTechnicaScreener(Resource):
             if last_update.empty:
                 postgres_db.engine.execute(
                     """
-                        INSERT INTO sp500_companies."last_update"
-                        VALUES ('{date}');
+                    INSERT INTO sp500_companies."last_update"
+                    VALUES ('{date}');
                     """.format(
                         date=today
                     )
@@ -70,7 +70,7 @@ class RESTTechnicaScreener(Resource):
                         UPDATE sp500_companies."last_update"
                         SET date = {new_date}
                         WHERE date={date};
-                    """.format(
+                        """.format(
                             new_date=today, date=last_update_value
                         )
                     )
@@ -98,7 +98,7 @@ class RESTTechnicaScreener(Resource):
                 if ticker in existing_tables:
                     postgres_db.engine.execute(
                         """
-                            DROP TABLE sp500_companies."{ticker}"
+                        DROP TABLE sp500_companies."{ticker}"
                         """.format(
                             ticker=ticker
                         )
