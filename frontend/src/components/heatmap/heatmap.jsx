@@ -129,11 +129,14 @@ const Heatmap = (props) => {
                 ? subSectorDimensions
                 : sectorDimensions;
             Object.keys(stocksBySector).forEach((sector) => {
-                stockTreemaps[sector] = getTreemap({
-                    data: stocksBySector[sector],
-                    width: dimensionsDict[sector].width,
-                    height: dimensionsDict[sector].height,
-                });
+                // idk it gave me a null response for some reason
+                if (sector !== "null") {
+                    stockTreemaps[sector] = getTreemap({
+                        data: stocksBySector[sector],
+                        width: dimensionsDict[sector].width,
+                        height: dimensionsDict[sector].height,
+                    });
+                }
             });
             setStockTreemaps(stockTreemaps);
             setSubSectorTreemaps(subSectorTreemaps);
@@ -173,7 +176,7 @@ const Heatmap = (props) => {
             <svg
                 width={heatmapWidth}
                 height={heatmapHeight}
-                onMouseLeave={() => clearMousePos}
+                onMouseLeave={() => clearMousePos()}
             >
                 <rect
                     width={heatmapWidth}
