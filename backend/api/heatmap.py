@@ -7,9 +7,6 @@ import numpy as np
 from bs4 import BeautifulSoup
 import json
 
-FINANCIAL_URL = os.environ.get("financial_url")
-FINANCIAL_KEY = os.environ.get("financial_key")
-
 # /heatmap
 class RESTHeatmap(Resource):
     def get(self):

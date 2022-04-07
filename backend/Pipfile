@@ -16,6 +16,11 @@ flask-cors = "*"
 pandas = "*"
 beautifulsoup4 = "*"
 lxml = "*"
+ta-lib = "*"
+yfinance = "*"
+psycopg2-binary = "*"
+sqlalchemy = "*"
+flask-sqlalchemy = "*"
 
 [requires]
 python_version = "3.8"
