@@ -33,13 +33,13 @@ const Dashboard = () => {
                 </StyledTypography>
                 <hr />
                 <Typography paragraph={true} sx={{ fontSize: 16 }}>
-                    I made <b>Stock Watch</b> because I felt like there weren't
+                    I made <i>Stock Watch</i> because I felt like there weren't
                     any good lightweight applications for analyzing stocks. I
                     found that the apps which let me conduct the analysis I
                     wanted were either too expensive or had way too many
-                    features I would never use. My future goal with{" "}
-                    <b>Stock Watch</b> is to provide a suite of useful analysis
-                    tools in an intuitive UI at a reasonable price.
+                    features I would never use. My future goal with Stock Watch
+                    is to provide a suite of useful analysis tools in an
+                    intuitive UI at a reasonable price.
                 </Typography>
                 <Typography paragraph={true} sx={{ fontSize: 16 }}>
                     My main focus for this app right now is providing tools for
@@ -56,15 +56,8 @@ const Dashboard = () => {
                     new feature.
                 </Typography>
                 <Typography paragraph={true} sx={{ fontSize: 16 }}>
-                    Right now, the comparison, heatmap, and technical analysis
-                    tools{" "}
-                    <b>
-                        <i>should</i>
-                    </b>{" "}
-                    work with <i>user authentication</i> and{" "}
-                    <i>fundamental analysis</i> being worked on. Bugs,
-                    suggestions or feature ideas are always welcome to be sent
-                    to{" "}
+                    Bugs, suggestions or feature ideas are always welcome to be
+                    sent to{" "}
                     <Link href="mailto:ajendo@uwaterloo.ca" color="inherit">
                         ajendo@uwaterloo.ca
                     </Link>
