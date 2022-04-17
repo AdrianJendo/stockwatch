@@ -52,9 +52,13 @@ const TickerGraph = (props) => {
         const lookupAllData = async () => {
             lookupPriceData("1Y", ticker).then((resp) => {
                 lookUpFinancialData(ticker).then((finStatements) => {
-                    if (resp !== null && finStatements !== null) {
-                        let dilutedShares = 0;
-                        let netIncome = 0;
+                    if (
+                        resp !== null &&
+                        finStatements !== null &&
+                        finStatements[new Date().getFullYear() - 1]
+                    ) {
+                        let dilutedShares = 1;
+                        let netIncome = 1;
                         finStatements[new Date().getFullYear() - 1].ic.forEach(
                             (entry) => {
                                 if (
@@ -102,6 +106,8 @@ const TickerGraph = (props) => {
                             marketCap,
                             priceToEarnings,
                         });
+                    } else {
+                        alert("Error getting data");
                     }
                 });
             });
@@ -144,7 +150,6 @@ const TickerGraph = (props) => {
                         position: "relative",
                         width: "600px",
                         minHeight: "200px",
-                        // margin: "20px",
                         margin: "auto",
                         justifyContent: "center",
                         alignContent: "center",
