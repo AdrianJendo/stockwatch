@@ -442,7 +442,27 @@ const WatchlistView = () => {
                                                             key={column.id}
                                                             align="right"
                                                         >
-                                                            {row[column.id]}
+                                                            {column.format &&
+                                                            row[column.id] !==
+                                                                "None"
+                                                                ? column.format ===
+                                                                  "$"
+                                                                    ? `$${
+                                                                          row[
+                                                                              column
+                                                                                  .id
+                                                                          ]
+                                                                      }`
+                                                                    : `${
+                                                                          row[
+                                                                              column
+                                                                                  .id
+                                                                          ] *
+                                                                          100
+                                                                      }%`
+                                                                : row[
+                                                                      column.id
+                                                                  ]}
                                                         </StyledTableCell>
                                                     )
                                                 )}
