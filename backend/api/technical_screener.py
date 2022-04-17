@@ -31,52 +31,53 @@ class RESTTechnicalScreener(Resource):
         df = pd.read_html(str(stats))[0]
         sp500_tickers = list(df["Symbol"])
 
-        symbols_with_pattern = []
-        for ticker in sp500_tickers:
-            # 2. Update data once per week
-            postgres_db.engine.execute(
-                """
+        postgres_db.engine.execute(
+            """
                 CREATE TABLE IF NOT EXISTS sp500_companies."last_update" (
                     date DATE NOT NULL
                 )
                 """
+        )
+
+        last_update = pd.read_sql_table(
+            "last_update", postgres_db.engine, schema="sp500_companies"
+        )
+
+        today = datetime.today().strftime("%Y-%m-%d")
+        lookup_data = False  # Whether or not to look up data from yfinance
+
+        if last_update.empty:
+            postgres_db.engine.execute(
+                """
+                INSERT INTO sp500_companies."last_update"
+                VALUES ('{date}');
+                """.format(
+                    date=today
+                )
             )
-
-            last_update = pd.read_sql_table(
-                "last_update", postgres_db.engine, schema="sp500_companies"
+            lookup_data = True
+        else:
+            last_update_value = last_update.iloc[0]["date"].strftime("%Y-%m-%d")
+            one_week_ago = (datetime.today() - relativedelta(days=7)).strftime(
+                "%Y-%m-%d"
             )
-
-            today = datetime.today().strftime("%Y-%m-%d")
-            lookup_data = False  # Whether or not to look up data from yfinance
-
-            if last_update.empty:
+            if last_update_value == one_week_ago:
                 postgres_db.engine.execute(
                     """
-                    INSERT INTO sp500_companies."last_update"
-                    VALUES ('{date}');
+                    UPDATE sp500_companies."last_update"
+                    SET date = {new_date}
+                    WHERE date={date};
                     """.format(
-                        date=today
+                        new_date=today, date=last_update_value
                     )
                 )
                 lookup_data = True
-            else:
-                last_update_value = last_update.iloc[0]["date"].strftime("%Y-%m-%d")
-                one_week_ago = (datetime.today() - relativedelta(days=7)).strftime(
-                    "%Y-%m-%d"
-                )
-                if last_update_value == one_week_ago:
-                    postgres_db.engine.execute(
-                        """
-                        UPDATE sp500_companies."last_update"
-                        SET date = {new_date}
-                        WHERE date={date};
-                        """.format(
-                            new_date=today, date=last_update_value
-                        )
-                    )
-                    lookup_data = True
 
-            if lookup_data:
+        symbols_with_pattern = []
+        for ticker in sp500_tickers:
+            # 2. Update data once per week
+
+            if lookup_data or ticker not in existing_tables:
                 start_date = (datetime.now() - relativedelta(years=1)).strftime(
                     "%Y-%m-%d"
                 )  # start 1 year ago
