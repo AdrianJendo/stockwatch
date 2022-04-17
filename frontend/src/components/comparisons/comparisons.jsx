@@ -240,7 +240,12 @@ const Comparisons = () => {
     };
 
     return (
-        <div>
+        <div
+            style={{
+                height: "100%",
+                overflow: "auto",
+            }}
+        >
             <div
                 style={{
                     display: "flex",
