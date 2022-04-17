@@ -27,7 +27,9 @@ class RESTDailyPrices(Resource):
             price_data_resp = requests.get(
                 tiingo_url + "daily/{}/prices".format(ticker),
                 params={
-                    "startDate": (today - BDay(2)).strftime("%Y-%m-%d"),
+                    "startDate": (today - BDay(4)).strftime(
+                        "%Y-%m-%d"
+                    ),  # pad an extra couple days just in case of weekends, stat holidays, etc.
                     "endDate": today.strftime("%Y-%m-%d"),
                     "token": tiingo_key,
                 },
