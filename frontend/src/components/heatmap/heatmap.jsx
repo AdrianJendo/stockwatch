@@ -17,127 +17,161 @@ const Heatmap = (props) => {
     const [subSectorTreemaps, setSubSectorTreemaps] = useState(null);
     const [mousePos, setMousePos] = useState(null);
 
-    const { selectedIndex } = props;
+    const { selectedIndex, heatmapPortfolios } = props;
 
     useEffect(() => {
         const getIndexTreemap = async () => {
             // get heatmap data from backend
-            const heatmapResponse = await axios.get("/api/heatmap", {
-                params: {
-                    index: selectedIndex,
-                },
-            });
+            if (["sp500", "nasdaq100", "dowjones"].includes(selectedIndex)) {
+                const heatmapResponse = await axios.get("/api/heatmap", {
+                    params: {
+                        index: selectedIndex,
+                    },
+                });
 
-            const data = heatmapResponse.data;
-            const stocks = JSON.parse(data.stocks);
-            const sectors = JSON.parse(data.sectors);
-            const subSectors = JSON.parse(data.sub_sectors);
+                const data = heatmapResponse.data;
+                const stocks = JSON.parse(data.stocks);
+                const sectors = JSON.parse(data.sectors);
+                const subSectors = JSON.parse(data.sub_sectors);
 
-            // format for treemap
-            const formattedSubSectors = {};
-            Object.keys(subSectors).forEach((sector) => {
-                formattedSubSectors[sector] = Object.keys(
-                    subSectors[sector]
-                ).map((subSector) => ({
-                    label: subSector === "null" ? null : subSector,
-                    value: subSectors[sector][subSector],
-                }));
-            });
+                // format for treemap
+                const formattedSubSectors = {};
+                Object.keys(subSectors).forEach((sector) => {
+                    formattedSubSectors[sector] = Object.keys(
+                        subSectors[sector]
+                    ).map((subSector) => ({
+                        label: subSector === "null" ? null : subSector,
+                        value: subSectors[sector][subSector],
+                    }));
+                });
 
-            // sort stocks into their respective sectors and format for getTreemap funcion
-            const stocksBySector = {};
-            stocks.forEach((stock) => {
-                const key = stock.SubSector ? stock.SubSector : stock.Sector;
-                if (!stocksBySector[key]) {
-                    stocksBySector[key] = [];
+                // sort stocks into their respective sectors and format for getTreemap funcion
+                const stocksBySector = {};
+                stocks.forEach((stock) => {
+                    const key = stock.SubSector
+                        ? stock.SubSector
+                        : stock.Sector;
+                    if (!stocksBySector[key]) {
+                        stocksBySector[key] = [];
+                    }
+                    stocksBySector[key].push({
+                        pctChg: stock["% Chg"],
+                        chg: stock.Chg,
+                        price: stock.Price,
+                        label: stock.Symbol,
+                        company: stock.Company,
+                        value: stock.Weight,
+                        color: stock.Chg >= 0 ? "green" : "red",
+                        brightness: Math.min(
+                            Math.max(Math.abs(stock["% Chg"] * 8), 0.75),
+                            1.25
+                        ),
+                    });
+                });
+
+                // format sector data for getTreemap function
+                const sectorData = Object.keys(sectors).map((sector) => {
+                    return {
+                        label: sector,
+                        value: sectors[sector],
+                    };
+                });
+
+                // sort sector data by largest to smallest sectors (passes by value)
+                sectorData.sort((a, b) => b.value - a.value);
+
+                // transform sectorData to treemap
+                const sectorTreemap = getTreemap({
+                    data: sectorData,
+                    width: heatmapWidth,
+                    height: heatmapHeight,
+                });
+
+                // define dimensions of each sector as boundaries for their stocks
+                const sectorDimensions = {};
+                sectorTreemap.forEach((sector) => {
+                    const { data, height, width, x, y } = sector;
+                    sectorDimensions[data.label] = {
+                        height: height - sectorCorrector,
+                        width,
+                        x,
+                        y,
+                    };
+                });
+
+                // populate sub sector weights for getTreemap function if exist
+                const subSectorTreemaps =
+                    Object.values(formattedSubSectors)[0][0].label && {};
+                const subSectorDimensions = {};
+                if (subSectorTreemaps) {
+                    Object.keys(formattedSubSectors).forEach((sector) => {
+                        formattedSubSectors[sector].sort(
+                            (a, b) => b.value - a.value
+                        );
+                        subSectorTreemaps[sector] = getTreemap({
+                            data: formattedSubSectors[sector],
+                            width: sectorDimensions[sector].width,
+                            height: sectorDimensions[sector].height,
+                        });
+
+                        subSectorTreemaps[sector].forEach((subSector) => {
+                            const { data, height, width, x, y } = subSector;
+                            subSectorDimensions[data.label] = {
+                                height,
+                                width,
+                                x,
+                                y,
+                            };
+                        });
+                    });
                 }
-                stocksBySector[key].push({
-                    pctChg: stock["% Chg"],
-                    chg: stock.Chg,
-                    price: stock.Price,
-                    label: stock.Symbol,
-                    company: stock.Company,
-                    value: stock.Weight,
-                    color: stock.Chg >= 0 ? "green" : "red",
+
+                // transform each list of stocks (sorted by sector) into their treemaps
+                const stockTreemaps = {};
+                const dimensionsDict = subSectorTreemaps
+                    ? subSectorDimensions
+                    : sectorDimensions;
+                Object.keys(stocksBySector).forEach((sector) => {
+                    // idk it gave me a null response for some reason
+                    if (sector !== "null") {
+                        stockTreemaps[sector] = getTreemap({
+                            data: stocksBySector[sector],
+                            width: dimensionsDict[sector].width,
+                            height: dimensionsDict[sector].height,
+                        });
+                    }
+                });
+                setStockTreemaps(stockTreemaps);
+                setSubSectorTreemaps(subSectorTreemaps);
+                setSectorTreemap(sectorTreemap);
+            } else {
+                // custom portfolio
+                const weightData = heatmapPortfolios[selectedIndex];
+                const priceDataResp = await axios.get("/api/daily_prices", {
+                    params: {
+                        tickers: JSON.stringify(Object.keys(weightData)),
+                    },
+                });
+
+                const stockData = priceDataResp.data.map((stock) => ({
+                    ...stock,
+                    value: weightData[stock.label],
+                    color: stock.chg >= 0 ? "green" : "red",
                     brightness: Math.min(
-                        Math.max(Math.abs(stock["% Chg"] * 8), 0.75),
+                        Math.max(Math.abs(stock.pctChg * 8), 0.75),
                         1.25
                     ),
+                }));
+
+                // transform stockData to treemap
+                const portfolioTreemap = getTreemap({
+                    data: stockData,
+                    width: heatmapWidth,
+                    height: heatmapHeight,
                 });
-            });
 
-            // format sector data for getTreemap function
-            const sectorData = Object.keys(sectors).map((sector) => {
-                return {
-                    label: sector,
-                    value: sectors[sector],
-                };
-            });
-
-            // sort sector data by largest to smallest sectors (passes by value)
-            sectorData.sort((a, b) => b.value - a.value);
-
-            // transform sectorData to treemap
-            const sectorTreemap = getTreemap({
-                data: sectorData,
-                width: heatmapWidth,
-                height: heatmapHeight,
-            });
-
-            // define dimensions of each sector as boundaries for their stocks
-            const sectorDimensions = {};
-            sectorTreemap.forEach((sector) => {
-                const { data, height, width, x, y } = sector;
-                sectorDimensions[data.label] = {
-                    height: height - sectorCorrector,
-                    width,
-                    x,
-                    y,
-                };
-            });
-
-            // populate sub sector weights for getTreemap function if exist
-            const subSectorTreemaps =
-                Object.values(formattedSubSectors)[0][0].label && {};
-            const subSectorDimensions = {};
-            if (subSectorTreemaps) {
-                Object.keys(formattedSubSectors).forEach((sector) => {
-                    formattedSubSectors[sector].sort(
-                        (a, b) => b.value - a.value
-                    );
-                    subSectorTreemaps[sector] = getTreemap({
-                        data: formattedSubSectors[sector],
-                        width: sectorDimensions[sector].width,
-                        height: sectorDimensions[sector].height,
-                    });
-
-                    subSectorTreemaps[sector].forEach((subSector) => {
-                        const { data, height, width, x, y } = subSector;
-                        subSectorDimensions[data.label] = {
-                            height,
-                            width,
-                            x,
-                            y,
-                        };
-                    });
-                });
+                setSectorTreemap(portfolioTreemap);
             }
-
-            // transform each list of stocks (sorted by sector) into their treemaps
-            const stockTreemaps = {};
-            const dimensionsDict = subSectorTreemaps
-                ? subSectorDimensions
-                : sectorDimensions;
-            Object.keys(stocksBySector).forEach((sector) => {
-                stockTreemaps[sector] = getTreemap({
-                    data: stocksBySector[sector],
-                    width: dimensionsDict[sector].width,
-                    height: dimensionsDict[sector].height,
-                });
-            });
-            setStockTreemaps(stockTreemaps);
-            setSubSectorTreemaps(subSectorTreemaps);
-            setSectorTreemap(sectorTreemap);
         };
         getIndexTreemap();
         return () => {
@@ -173,7 +207,7 @@ const Heatmap = (props) => {
             <svg
                 width={heatmapWidth}
                 height={heatmapHeight}
-                onMouseLeave={() => clearMousePos}
+                onMouseLeave={() => clearMousePos()}
             >
                 <rect
                     width={heatmapWidth}
@@ -181,191 +215,241 @@ const Heatmap = (props) => {
                     strokeWidth="1"
                     stroke="black"
                 ></rect>
-                {sectorTreemap.map((sector) => (
-                    <g key={sector.data.label}>
-                        <svg
-                            x={sector.x}
-                            y={sector.y + sectorCorrector}
-                            height={sector.height}
-                            width={sector.width}
-                        >
-                            {subSectorTreemaps !== null
-                                ? subSectorTreemaps[sector.data.label].map(
-                                      (subSector) => (
-                                          <g key={subSector.data.label}>
-                                              <svg
-                                                  x={subSector.x}
-                                                  y={subSector.y}
-                                                  height={subSector.height}
-                                              >
-                                                  {stockTreemaps[
-                                                      subSector.data.label
-                                                  ].map((stock) => (
-                                                      <g
-                                                          key={stock.data.label}
-                                                          fill={`${stock.data.color}`}
-                                                          filter={`brightness(${stock.data.brightness})`}
-                                                      >
-                                                          <rect
-                                                              x={stock.x}
-                                                              y={stock.y}
-                                                              width={
-                                                                  stock.width
-                                                              }
-                                                              height={
-                                                                  stock.height
-                                                              }
-                                                              strokeWidth="1"
-                                                              stroke="black"
-                                                              onMouseMove={(
-                                                                  e
-                                                              ) =>
-                                                                  updateMousePos(
-                                                                      e,
-                                                                      sector
-                                                                          .data
-                                                                          .label,
-                                                                      subSector
-                                                                          .data
-                                                                          .label,
-                                                                      stock.data
-                                                                  )
-                                                              }
-                                                          ></rect>
+                {["sp500", "nasdaq100", "dowjones"].includes(selectedIndex) &&
+                Object.keys(stockTreemaps).length !== 0
+                    ? sectorTreemap.map((sector) => (
+                          <g key={sector.data.label}>
+                              <svg
+                                  x={sector.x}
+                                  y={sector.y + sectorCorrector}
+                                  height={sector.height}
+                                  width={sector.width}
+                              >
+                                  {subSectorTreemaps !== null
+                                      ? subSectorTreemaps[
+                                            sector.data.label
+                                        ].map((subSector) => (
+                                            <g key={subSector.data.label}>
+                                                <svg
+                                                    x={subSector.x}
+                                                    y={subSector.y}
+                                                    height={subSector.height}
+                                                >
+                                                    {stockTreemaps[
+                                                        subSector.data.label
+                                                    ].map((stock) => (
+                                                        <g
+                                                            key={
+                                                                stock.data.label
+                                                            }
+                                                            fill={`${stock.data.color}`}
+                                                            filter={`brightness(${stock.data.brightness})`}
+                                                        >
+                                                            <rect
+                                                                x={stock.x}
+                                                                y={stock.y}
+                                                                width={
+                                                                    stock.width
+                                                                }
+                                                                height={
+                                                                    stock.height
+                                                                }
+                                                                strokeWidth="1"
+                                                                stroke="black"
+                                                                onMouseMove={(
+                                                                    e
+                                                                ) =>
+                                                                    updateMousePos(
+                                                                        e,
+                                                                        sector
+                                                                            .data
+                                                                            .label,
+                                                                        subSector
+                                                                            .data
+                                                                            .label,
+                                                                        stock.data
+                                                                    )
+                                                                }
+                                                            ></rect>
 
-                                                          <text
-                                                              style={{
-                                                                  position:
-                                                                      "relative",
-                                                                  dominantBaseline:
-                                                                      "middle",
-                                                                  textAnchor:
-                                                                      "middle",
-                                                                  cursor: "default",
-                                                                  userSelect:
-                                                                      "none",
-                                                                  fontSize:
-                                                                      "10px",
-                                                              }}
-                                                              x={
-                                                                  stock.x +
-                                                                  stock.width /
-                                                                      2
-                                                              }
-                                                              y={
-                                                                  stock.y +
-                                                                  stock.height /
-                                                                      2
-                                                              }
-                                                              fill="white"
-                                                          >
-                                                              {stock.data.label}
-                                                          </text>
-                                                          <text
-                                                              style={{
-                                                                  position:
-                                                                      "relative",
-                                                                  dominantBaseline:
-                                                                      "middle",
-                                                                  textAnchor:
-                                                                      "middle",
-                                                                  cursor: "default",
-                                                                  userSelect:
-                                                                      "none",
-                                                                  fontSize:
-                                                                      "10px",
-                                                              }}
-                                                              x={
-                                                                  stock.x +
-                                                                  stock.width /
-                                                                      2
-                                                              }
-                                                              y={
-                                                                  stock.y +
-                                                                  stock.height /
-                                                                      2 +
-                                                                  16
-                                                              }
-                                                              fill="white"
-                                                          >
-                                                              {
-                                                                  stock.data
-                                                                      .pctChg
-                                                              }
-                                                              %
-                                                          </text>
-                                                      </g>
-                                                  ))}
-                                              </svg>
-                                          </g>
-                                      )
-                                  )
-                                : stockTreemaps[sector.data.label].map(
-                                      (stock) => (
-                                          <g
-                                              key={stock.data.label}
-                                              fill={`${stock.data.color}`}
-                                              filter={`brightness(${stock.data.brightness})`}
-                                          >
-                                              <rect
-                                                  x={stock.x}
-                                                  y={stock.y}
-                                                  width={stock.width}
-                                                  height={stock.height}
-                                                  strokeWidth="1"
-                                                  stroke="black"
-                                                  onMouseMove={(e) =>
-                                                      updateMousePos(
-                                                          e,
-                                                          sector.data.label,
-                                                          null,
-                                                          stock.data
-                                                      )
-                                                  }
-                                              ></rect>
-                                              <text
-                                                  style={{
-                                                      position: "relative",
-                                                      dominantBaseline:
-                                                          "middle",
-                                                      textAnchor: "middle",
-                                                      cursor: "default",
-                                                      userSelect: "none",
-                                                      fontSize: "10px",
-                                                  }}
-                                                  x={stock.x + stock.width / 2}
-                                                  y={stock.y + stock.height / 2}
-                                                  fill="white"
-                                              >
-                                                  {stock.data.label}
-                                              </text>
-                                          </g>
-                                      )
-                                  )}
-                        </svg>
-                        <svg
-                            width={sector.width}
-                            x={sector.x}
-                            y={sector.y}
-                            height="16"
-                        >
-                            <text
-                                style={{
-                                    dominantBaseline: "middle",
-                                    textAnchor: "middle",
-                                    cursor: "default",
-                                    userSelect: "none",
-                                    fontSize: "12px",
-                                }}
-                                x={sector.width / 2}
-                                y="8"
-                                fill="white"
-                            >
-                                {sector.data.label}
-                            </text>
-                        </svg>
-                    </g>
-                ))}
+                                                            <text
+                                                                style={{
+                                                                    position:
+                                                                        "relative",
+                                                                    dominantBaseline:
+                                                                        "middle",
+                                                                    textAnchor:
+                                                                        "middle",
+                                                                    cursor: "default",
+                                                                    userSelect:
+                                                                        "none",
+                                                                    fontSize:
+                                                                        "10px",
+                                                                }}
+                                                                x={
+                                                                    stock.x +
+                                                                    stock.width /
+                                                                        2
+                                                                }
+                                                                y={
+                                                                    stock.y +
+                                                                    stock.height /
+                                                                        2
+                                                                }
+                                                                fill="white"
+                                                            >
+                                                                {
+                                                                    stock.data
+                                                                        .label
+                                                                }
+                                                            </text>
+                                                            <text
+                                                                style={{
+                                                                    position:
+                                                                        "relative",
+                                                                    dominantBaseline:
+                                                                        "middle",
+                                                                    textAnchor:
+                                                                        "middle",
+                                                                    cursor: "default",
+                                                                    userSelect:
+                                                                        "none",
+                                                                    fontSize:
+                                                                        "10px",
+                                                                }}
+                                                                x={
+                                                                    stock.x +
+                                                                    stock.width /
+                                                                        2
+                                                                }
+                                                                y={
+                                                                    stock.y +
+                                                                    stock.height /
+                                                                        2 +
+                                                                    16
+                                                                }
+                                                                fill="white"
+                                                            >
+                                                                {
+                                                                    stock.data
+                                                                        .pctChg
+                                                                }
+                                                                %
+                                                            </text>
+                                                        </g>
+                                                    ))}
+                                                </svg>
+                                            </g>
+                                        ))
+                                      : stockTreemaps[sector.data.label].map(
+                                            (stock) => (
+                                                <g
+                                                    key={stock.data.label}
+                                                    fill={`${stock.data.color}`}
+                                                    filter={`brightness(${stock.data.brightness})`}
+                                                >
+                                                    <rect
+                                                        x={stock.x}
+                                                        y={stock.y}
+                                                        width={stock.width}
+                                                        height={stock.height}
+                                                        strokeWidth="1"
+                                                        stroke="black"
+                                                        onMouseMove={(e) =>
+                                                            updateMousePos(
+                                                                e,
+                                                                sector.data
+                                                                    .label,
+                                                                null,
+                                                                stock.data
+                                                            )
+                                                        }
+                                                    ></rect>
+                                                    <text
+                                                        style={{
+                                                            position:
+                                                                "relative",
+                                                            dominantBaseline:
+                                                                "middle",
+                                                            textAnchor:
+                                                                "middle",
+                                                            cursor: "default",
+                                                            userSelect: "none",
+                                                            fontSize: "10px",
+                                                        }}
+                                                        x={
+                                                            stock.x +
+                                                            stock.width / 2
+                                                        }
+                                                        y={
+                                                            stock.y +
+                                                            stock.height / 2
+                                                        }
+                                                        fill="white"
+                                                    >
+                                                        {stock.data.label}
+                                                    </text>
+                                                </g>
+                                            )
+                                        )}
+                              </svg>
+                              <svg
+                                  width={sector.width}
+                                  x={sector.x}
+                                  y={sector.y}
+                                  height="16"
+                              >
+                                  <text
+                                      style={{
+                                          dominantBaseline: "middle",
+                                          textAnchor: "middle",
+                                          cursor: "default",
+                                          userSelect: "none",
+                                          fontSize: "12px",
+                                      }}
+                                      x={sector.width / 2}
+                                      y="8"
+                                      fill="white"
+                                  >
+                                      {sector.data.label}
+                                  </text>
+                              </svg>
+                          </g>
+                      ))
+                    : sectorTreemap.map((stock) => (
+                          <g
+                              key={stock.data.label}
+                              fill={`${stock.data.color}`}
+                              filter={`brightness(${stock.data.brightness})`}
+                          >
+                              <rect
+                                  x={stock.x}
+                                  y={stock.y}
+                                  width={stock.width}
+                                  height={stock.height}
+                                  strokeWidth="1"
+                                  stroke="black"
+                                  onMouseMove={(e) =>
+                                      updateMousePos(e, null, null, stock.data)
+                                  }
+                              ></rect>
+                              <text
+                                  style={{
+                                      position: "relative",
+                                      dominantBaseline: "middle",
+                                      textAnchor: "middle",
+                                      cursor: "default",
+                                      userSelect: "none",
+                                      fontSize: "10px",
+                                  }}
+                                  x={stock.x + stock.width / 2}
+                                  y={stock.y + stock.height / 2}
+                                  fill="white"
+                              >
+                                  {stock.data.label}
+                              </text>
+                          </g>
+                      ))}
                 Sorry, your browser does not support inline SVG.
                 {mousePos && (
                     <svg

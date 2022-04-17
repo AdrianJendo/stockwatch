@@ -30,6 +30,7 @@ from api import (
     price_history,
     fundamentals,
     technical_screener,
+    daily_prices,
 )
 
 # Routes
@@ -55,6 +56,9 @@ api.add_resource(fundamentals.RESTFundamentalData, "/fundamentals/<ticker>")
 
 # technical screener
 api.add_resource(technical_screener.RESTTechnicalScreener, "/technical_screener")
+
+# daily price movements
+api.add_resource(daily_prices.RESTDailyPrices, "/daily_prices")
 
 # Register Routes
 app.register_blueprint(api_bp, url_prefix="/api")

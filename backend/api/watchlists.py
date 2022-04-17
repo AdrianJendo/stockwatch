@@ -4,8 +4,8 @@ import requests
 import json
 import os
 
-data_url = os.environ.get("alpha_vantage_url")
-api_key = os.environ.get("alpha_vantage_key")
+alpha_url = os.environ.get("alpha_vantage_url")
+alpha_key = os.environ.get("alpha_vantage_key")
 
 # /watchlists/columns
 class RESTWatchlistColumns(Resource):
@@ -24,11 +24,11 @@ class RESTWatchlistColumns(Resource):
                     data = {}
                     for time_period in time_periods["SMA"]:
                         resp = requests.get(
-                            data_url,
+                            alpha_url,
                             params={
                                 "function": "SMA",
                                 "symbol": ticker,
-                                "apikey": api_key,
+                                "apikey": alpha_key,
                                 "time_period": time_period,
                                 "interval": "daily",
                                 "series_type": "close",
@@ -39,11 +39,11 @@ class RESTWatchlistColumns(Resource):
                         )[0]["SMA"]
                     for time_period in time_periods["EMA"]:
                         resp = requests.get(
-                            data_url,
+                            alpha_url,
                             params={
                                 "function": "EMA",
                                 "symbol": ticker,
-                                "apikey": api_key,
+                                "apikey": alpha_key,
                                 "time_period": time_period,
                                 "interval": "daily",
                                 "series_type": "close",
@@ -54,11 +54,11 @@ class RESTWatchlistColumns(Resource):
                         )[0]["EMA"]
                 elif search_function == "RSI":
                     resp = requests.get(
-                        data_url,
+                        alpha_url,
                         params={
                             "function": "RSI",
                             "symbol": ticker,
-                            "apikey": api_key,
+                            "apikey": alpha_key,
                             "interval": "daily",
                             "time_period": 10,
                             "series_type": "close",
@@ -71,11 +71,11 @@ class RESTWatchlistColumns(Resource):
                     }
                 else:
                     resp = requests.get(
-                        data_url,
+                        alpha_url,
                         params={
                             "function": search_function,
                             "symbol": ticker,
-                            "apikey": api_key,
+                            "apikey": alpha_key,
                         },
                     )
                     if search_function in [

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import * as XLSX from "xlsx";
 
 // mui
 import { styled, useTheme } from "@mui/material/styles";
@@ -18,6 +19,7 @@ import {
     ListItemText,
     Select,
     MenuItem,
+    Button,
 } from "@mui/material";
 import {
     Dashboard,
@@ -100,8 +102,9 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function PersistentDrawerLeft(props) {
     const { dark, setDark } = props;
     const theme = useTheme();
-    const [open, setOpen] = React.useState(true);
-    const [selectedIndex, setSelectedIndex] = React.useState("sp500");
+    const [open, setOpen] = useState(true);
+    const [selectedIndex, setSelectedIndex] = useState("sp500");
+    const [heatmapPortfolios, setHeatmapPortfolios] = useState({});
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -109,6 +112,52 @@ export default function PersistentDrawerLeft(props) {
 
     const toggleSwitch = () => {
         setDark(!dark);
+    };
+
+    const uploadPortfolio = (e) => {
+        const file = e.target.files[0];
+        const fileReader = new FileReader();
+        try {
+            fileReader.readAsBinaryString(file);
+        } catch {}
+
+        fileReader.onload = (e) => {
+            /* Parse data */
+            const bstr = e.target.result;
+            const wb = XLSX.read(bstr, { type: "binary" });
+            // only use first sheet
+            const wsName = wb.SheetNames[0];
+            const ws = wb.Sheets[wsName];
+            const wsData = XLSX.utils.sheet_to_csv(ws, { header: 1 });
+            const wsRows = wsData.split("\n");
+            const rowData = wsRows.slice(1);
+            const columns = wsRows[0].toLowerCase().split(",");
+            const containsWeightsCol = columns.includes("weight");
+            const portfolio = {};
+
+            let weightSum = 0;
+            rowData.forEach((row) => {
+                const rowVals = row.split(",");
+                const ticker = rowVals[0];
+                const weight = containsWeightsCol
+                    ? parseInt(rowVals[1]) / 100
+                    : Math.floor((1 / rowData.length) * 100) / 100;
+
+                portfolio[ticker] = weight;
+                weightSum += weight;
+            });
+
+            if (weightSum > 1) {
+                alert("Portfolio weights are greater than 1");
+                return;
+            }
+
+            const newHeatmapPortfolios = { ...heatmapPortfolios };
+            newHeatmapPortfolios[wsName] = portfolio;
+            setHeatmapPortfolios(newHeatmapPortfolios);
+        };
+
+        e.target.value = "";
     };
 
     const colorTheme = dark ? "dark" : "light";
@@ -147,27 +196,55 @@ export default function PersistentDrawerLeft(props) {
                             </Link>
                             <TickerSearch />
                             {window.location.href.includes("heatmap") && (
-                                <Select
-                                    value={selectedIndex}
-                                    label="Index"
-                                    onChange={(e) =>
-                                        setSelectedIndex(e.target.value)
-                                    }
-                                    sx={{
+                                <div
+                                    style={{
+                                        display: "flex",
                                         margin: "auto",
-                                        height: "32px",
                                     }}
                                 >
-                                    <MenuItem value={"sp500"}>
-                                        {"S&P 500"}
-                                    </MenuItem>
-                                    <MenuItem value={"nasdaq100"}>
-                                        NASDAQ 100
-                                    </MenuItem>
-                                    <MenuItem value={"dowjones"}>
-                                        Dow Jones
-                                    </MenuItem>
-                                </Select>
+                                    <Select
+                                        value={selectedIndex}
+                                        label="Index"
+                                        onChange={(e) =>
+                                            setSelectedIndex(e.target.value)
+                                        }
+                                        sx={{
+                                            margin: "auto 20px",
+                                            height: "38px",
+                                        }}
+                                    >
+                                        <MenuItem value={"sp500"}>
+                                            {"S&P 500"}
+                                        </MenuItem>
+                                        <MenuItem value={"nasdaq100"}>
+                                            NASDAQ 100
+                                        </MenuItem>
+                                        <MenuItem value={"dowjones"}>
+                                            Dow Jones
+                                        </MenuItem>
+                                        {Object.keys(heatmapPortfolios).map(
+                                            (portfolio) => (
+                                                <MenuItem
+                                                    key={portfolio}
+                                                    value={portfolio}
+                                                >
+                                                    {portfolio}
+                                                </MenuItem>
+                                            )
+                                        )}
+                                    </Select>
+                                    <Button
+                                        variant="contained"
+                                        component="label"
+                                        sx={{
+                                            margin: "auto 20px",
+                                        }}
+                                        onChange={(e) => uploadPortfolio(e)}
+                                    >
+                                        Upload Portfolio
+                                        <input type="file" hidden />
+                                    </Button>
+                                </div>
                             )}
                         </div>
                         <MUISwitch defaultChecked toggleSwitch={toggleSwitch} />
@@ -319,7 +396,10 @@ export default function PersistentDrawerLeft(props) {
                             <Route
                                 path="/heatmap"
                                 element={
-                                    <Heatmap selectedIndex={selectedIndex} />
+                                    <Heatmap
+                                        selectedIndex={selectedIndex}
+                                        heatmapPortfolios={heatmapPortfolios}
+                                    />
                                 }
                             />
                             <Route
