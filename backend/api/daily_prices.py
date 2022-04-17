@@ -9,6 +9,8 @@ import os
 
 tiingo_url = os.environ.get("tiingo_url")
 tiingo_key = os.environ.get("tiingo_key")
+alpha_url = os.environ.get("alpha_vantage_url")
+alpha_key = os.environ.get("alpha_vantage_key")
 
 # /daily_prices
 class RESTDailyPrices(Resource):
@@ -44,9 +46,18 @@ class RESTDailyPrices(Resource):
             )
             ticker_info["price"] = round(df.iloc[-1]["adjClose"], 2)
             ticker_info["label"] = ticker
-            # Can't use yfinance here (also tried alphavantage and was hitting api limits), need to wait until we can make more requests before we can include the company name
+            # Can't use yfinance here, way too slow for number of requests needed
             # ticker_info["company"] = yf.Ticker(ticker).info["longName"]
-            ticker_info["company"] = "Company"
+            # alpha vantage will work with student plan (150 calls per minute)
+            ticker_info["company"] = requests.get(
+                alpha_url,
+                params={
+                    "function": "OVERVIEW",
+                    "symbol": ticker,
+                    "apikey": alpha_key,
+                },
+            ).json()["Name"]
+
             price_data.append(ticker_info)
 
         return price_data
