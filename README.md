@@ -21,7 +21,7 @@ definitely be a project I leave alone for months at a time,
 and then find motivation to come back to it and build out a
 new feature.
 
-Bugs, suggestions or feature ideas are always welcome to be
+Bugs, suggestions, or feature ideas are always welcome to be
 sent to <Link href="mailto:ajendo@uwaterloo.ca" color="inherit">
 ajendo@uwaterloo.ca</Link>.
 

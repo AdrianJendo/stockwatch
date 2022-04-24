@@ -56,7 +56,7 @@ const Dashboard = () => {
                     new feature.
                 </Typography>
                 <Typography paragraph={true} sx={{ fontSize: 16 }}>
-                    Bugs, suggestions or feature ideas are always welcome to be
+                    Bugs, suggestions, or feature ideas are always welcome to be
                     sent to{" "}
                     <Link href="mailto:ajendo@uwaterloo.ca" color="inherit">
                         ajendo@uwaterloo.ca
