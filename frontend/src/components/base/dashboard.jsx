@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
 
 import * as XLSX from "xlsx";
 
@@ -51,7 +56,7 @@ import FundamentalAnalysis from "components/fundamentalAnalysis/fundamentalAnaly
 import About from "components/about/about";
 import Crypto from "components/crypto/crypto";
 import Login from "components/auth/login";
-import Register from "components/auth/register"
+import Register from "components/auth/register";
 
 const drawerWidth = 230;
 
@@ -123,7 +128,7 @@ export default function PersistentDrawerLeft(props) {
         const fileReader = new FileReader();
         try {
             fileReader.readAsBinaryString(file);
-        } catch { }
+        } catch {}
 
         fileReader.onload = (e) => {
             /* Parse data */
@@ -198,9 +203,7 @@ export default function PersistentDrawerLeft(props) {
                                     Stock Watch
                                 </Typography>
                             </Link>
-                            {user &&
-                                <TickerSearch />
-                            }
+                            {user && <TickerSearch />}
                             {user && window.location.href.includes("heatmap") && (
                                 <div
                                     style={{
@@ -254,17 +257,17 @@ export default function PersistentDrawerLeft(props) {
                             )}
                         </div>
                         {/* <MUISwitch defaultChecked toggleSwitch={toggleSwitch} /> */}
-                        {user ? <Button
-                            variant="contained"
-                        >
-                            Logout
-                            <input type="file" hidden />
-                        </Button> : <Button
-                            variant="contained"
-                        >
-                            Login
-                            <input type="file" hidden />
-                        </Button>}
+                        {user ? (
+                            <Button variant="contained">
+                                Logout
+                                <input type="file" hidden />
+                            </Button>
+                        ) : (
+                            <Button variant="contained">
+                                Login
+                                <input type="file" hidden />
+                            </Button>
+                        )}
                     </Toolbar>
                 </StyledAppBar>
                 <Drawer
@@ -390,7 +393,7 @@ export default function PersistentDrawerLeft(props) {
                 </Drawer>
                 <Main open={user && open}>
                     <DrawerHeader />
-                    {user ?
+                    {user ? (
                         <div
                             style={{
                                 height: "calc(100vh - 64px - 40px)",
@@ -400,7 +403,9 @@ export default function PersistentDrawerLeft(props) {
                             <Routes>
                                 <Route
                                     path="/"
-                                    element={<MarketOverview theme={colorTheme} />}
+                                    element={
+                                        <MarketOverview theme={colorTheme} />
+                                    }
                                 />
                                 <Route
                                     path="/ticker/:ticker"
@@ -415,7 +420,9 @@ export default function PersistentDrawerLeft(props) {
                                     element={
                                         <Heatmap
                                             selectedIndex={selectedIndex}
-                                            heatmapPortfolios={heatmapPortfolios}
+                                            heatmapPortfolios={
+                                                heatmapPortfolios
+                                            }
                                         />
                                     }
                                 />
@@ -437,29 +444,24 @@ export default function PersistentDrawerLeft(props) {
                                 <Route
                                     path="/fundamental"
                                     element={
-                                        <FundamentalAnalysis theme={colorTheme} />
+                                        <FundamentalAnalysis
+                                            theme={colorTheme}
+                                        />
                                     }
                                 />
                                 <Route path="/about" element={<About />} />
                             </Routes>
                         </div>
-                        :
+                    ) : (
                         <Routes>
-                            <Route path="*"
+                            <Route
+                                path="*"
                                 element={<Navigate to="/login" />}
-                            >
-
-                            </Route>
-                            <Route
-                                path="/login"
-                                element={<Login />}
-                            />
-                            <Route
-                                path="/register"
-                                element={<Register />}
-                            />
+                            ></Route>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register />} />
                         </Routes>
-                    }
+                    )}
                 </Main>
             </Router>
         </Box>
