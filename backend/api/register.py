@@ -6,7 +6,7 @@ from models.user import User
 
 # /register
 class RESTRegister(Resource):
-    def post(user):
+    def post(self):
         data = json.loads(request.data)
         if "username" not in data or "password" not in data or "email" not in data:
             return {"error": "field missing"}

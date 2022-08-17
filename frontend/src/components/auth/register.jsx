@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { TextField, Button, Typography, Paper, Link } from "@mui/material";
 import { styled } from "@mui/system";
+import qs from "qs";
+import bcrypt from "bcryptjs";
+import { useNavigate } from "react-router-dom";
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     marginTop: "30px",
@@ -12,6 +15,7 @@ const Register = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [username, setUsername] = useState("");
+    const navigate = useNavigate();
 
     const isValidEmail = (email) => {
         return /\S+@\S+\.\S+/.test(email);
@@ -38,12 +42,30 @@ const Register = () => {
     const registerUser = () => {
         if (!isValidEmail(email)) {
             alert("Invalid Email");
-        } else if (!isValidPassword(password)) {
+        } else if (!isValidUsername(username)) {
+            alert("Username must be at least 5 characters long");
+        } else if (isValidPassword(password)) {
+            bcrypt.hash(password, 10).then((passwordHash) => {
+                const params = {};
+                params["email"] = email;
+                params["username"] = username;
+                params["password"] = passwordHash;
+                axios.post("/api/register", params).then(
+                    (resp) => {
+                        if (resp.data.error) {
+                            alert(resp.data.error);
+                        } else {
+                            console.log("SUCCESS");
+                            console.log(resp);
+                            alert("Registration sucessful");
+                            navigate("/login");
+                        }
+                    },
+                    (errorResponse) => {}
+                );
+                console.log("REGISTER");
+            });
         }
-        // else if () {
-
-        // }
-        console.log("REGISTER");
     };
 
     return (
