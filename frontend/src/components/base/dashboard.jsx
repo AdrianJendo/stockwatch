@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
 import * as XLSX from "xlsx";
 
 // mui
@@ -50,6 +51,7 @@ import FundamentalAnalysis from "components/fundamentalAnalysis/fundamentalAnaly
 import About from "components/about/about";
 import Crypto from "components/crypto/crypto";
 import Login from "components/auth/login";
+import Register from "components/auth/register"
 
 const drawerWidth = 230;
 
@@ -265,191 +267,200 @@ export default function PersistentDrawerLeft(props) {
                         </Button>}
                     </Toolbar>
                 </StyledAppBar>
-                {user ?
-                    <div>
-                        <Drawer
-                            sx={{
-                                width: drawerWidth,
-                                flexShrink: 0,
-                                "& .MuiDrawer-paper": {
-                                    width: drawerWidth,
-                                    boxSizing: "border-box",
-                                },
-                            }}
-                            variant="persistent"
-                            anchor="left"
-                            open={open}
-                        >
-                            <DrawerHeader>
-                                <IconButton onClick={toggleDrawer}>
-                                    {theme.direction === "ltr" ? (
-                                        <ChevronLeft />
-                                    ) : (
-                                        <ChevronRight />
-                                    )}
-                                </IconButton>
-                            </DrawerHeader>
-                            <Divider />
-                            <List>
-                                {[
-                                    {
-                                        text: "Market Overview",
-                                        icon: <GridView />,
-                                        link: "/",
-                                    },
-                                    {
-                                        text: "Watchlists",
-                                        icon: <TrendingUp />,
-                                        link: "/watchlists",
-                                    },
-                                    {
-                                        text: "Heatmap",
-                                        icon: <Dashboard />,
-                                        link: "/heatmap",
-                                    },
-                                    {
-                                        text: "Comparisons",
-                                        icon: <CompareArrows />,
-                                        link: "/comparisons",
-                                    },
-                                    {
-                                        text: "Crypto",
-                                        icon: <CurrencyBitcoin />,
-                                        link: "/crypto",
-                                    },
-                                ].map((item) => (
-                                    <Link
-                                        href={item.link}
-                                        color="inherit"
-                                        underline="none"
-                                        key={item.text}
-                                    >
-                                        <ListItem button>
-                                            <ListItemIcon>{item.icon}</ListItemIcon>
-                                            <ListItemText primary={item.text} />
-                                        </ListItem>
-                                    </Link>
-                                ))}
-                            </List>
-                            <Divider />
-                            <List>
-                                {[
-                                    {
-                                        text: "Technical Analysis",
-                                        icon: <CandlestickChart />,
-                                        link: "/technical",
-                                    },
-                                    {
-                                        text: "Technical Screener",
-                                        icon: <ScreenSearchDesktop />,
-                                        link: "/technical_screener",
-                                    },
-                                    {
-                                        text: "Fundamental Analysis",
-                                        icon: <AttachMoney />,
-                                        link: "/fundamental",
-                                    },
-                                ].map((item) => (
-                                    <Link
-                                        href={item.link}
-                                        color="inherit"
-                                        underline="none"
-                                        key={item.text}
-                                        sx={{ padding: 0 }}
-                                    >
-                                        <ListItem button>
-                                            <ListItemIcon>{item.icon}</ListItemIcon>
-                                            <ListItemText primary={item.text} />
-                                        </ListItem>
-                                    </Link>
-                                ))}
-                            </List>
-                            <Divider />
-                            <List>
-                                {[
-                                    {
-                                        text: "About",
-                                        icon: <Info />,
-                                        link: "/about",
-                                    },
-                                ].map((item) => (
-                                    <Link
-                                        href={item.link}
-                                        color="inherit"
-                                        underline="none"
-                                        key={item.text}
-                                        sx={{ padding: 0 }}
-                                    >
-                                        <ListItem button>
-                                            <ListItemIcon>{item.icon}</ListItemIcon>
-                                            <ListItemText primary={item.text} />
-                                        </ListItem>
-                                    </Link>
-                                ))}
-                            </List>
-                        </Drawer>
-                        <Main open={open}>
-                            <DrawerHeader />
-
-                            <div
-                                style={{
-                                    height: "calc(100vh - 64px - 40px)",
-                                    overflow: "hidden",
-                                }}
+                <Drawer
+                    sx={{
+                        width: drawerWidth,
+                        flexShrink: 0,
+                        "& .MuiDrawer-paper": {
+                            width: drawerWidth,
+                            boxSizing: "border-box",
+                        },
+                    }}
+                    variant="persistent"
+                    anchor="left"
+                    open={user && open}
+                >
+                    <DrawerHeader>
+                        <IconButton onClick={toggleDrawer}>
+                            {theme.direction === "ltr" ? (
+                                <ChevronLeft />
+                            ) : (
+                                <ChevronRight />
+                            )}
+                        </IconButton>
+                    </DrawerHeader>
+                    <Divider />
+                    <List>
+                        {[
+                            {
+                                text: "Market Overview",
+                                icon: <GridView />,
+                                link: "/",
+                            },
+                            {
+                                text: "Watchlists",
+                                icon: <TrendingUp />,
+                                link: "/watchlists",
+                            },
+                            {
+                                text: "Heatmap",
+                                icon: <Dashboard />,
+                                link: "/heatmap",
+                            },
+                            {
+                                text: "Comparisons",
+                                icon: <CompareArrows />,
+                                link: "/comparisons",
+                            },
+                            {
+                                text: "Crypto",
+                                icon: <CurrencyBitcoin />,
+                                link: "/crypto",
+                            },
+                        ].map((item) => (
+                            <Link
+                                href={item.link}
+                                color="inherit"
+                                underline="none"
+                                key={item.text}
                             >
-                                <Routes>
-                                    <Route
-                                        path="/"
-                                        element={<MarketOverview theme={colorTheme} />}
-                                    />
-                                    <Route
-                                        path="/ticker/:ticker"
-                                        element={<TickerGraph theme={colorTheme} />}
-                                    />
-                                    <Route
-                                        path="/watchlists"
-                                        element={<Watchlists />}
-                                    />
-                                    <Route
-                                        path="/heatmap"
-                                        element={
-                                            <Heatmap
-                                                selectedIndex={selectedIndex}
-                                                heatmapPortfolios={heatmapPortfolios}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="/comparisons"
-                                        element={<Comparisons />}
-                                    />
-                                    <Route path="/crypto" element={<Crypto />} />
-                                    <Route
-                                        path="/technical"
-                                        element={
-                                            <TechnicalAnalysis theme={colorTheme} />
-                                        }
-                                    />
-                                    <Route
-                                        path="/technical_screener"
-                                        element={<TechnicalScreener />}
-                                    />
-                                    <Route
-                                        path="/fundamental"
-                                        element={
-                                            <FundamentalAnalysis theme={colorTheme} />
-                                        }
-                                    />
-                                    <Route path="/about" element={<About />} />
-                                </Routes>
-                            </div>
-                        </Main>
-                    </div>
-                    :
-                    <Main open={false}>
-                        <Login/>
-                    </Main>
-                }
+                                <ListItem button>
+                                    <ListItemIcon>{item.icon}</ListItemIcon>
+                                    <ListItemText primary={item.text} />
+                                </ListItem>
+                            </Link>
+                        ))}
+                    </List>
+                    <Divider />
+                    <List>
+                        {[
+                            {
+                                text: "Technical Analysis",
+                                icon: <CandlestickChart />,
+                                link: "/technical",
+                            },
+                            {
+                                text: "Technical Screener",
+                                icon: <ScreenSearchDesktop />,
+                                link: "/technical_screener",
+                            },
+                            {
+                                text: "Fundamental Analysis",
+                                icon: <AttachMoney />,
+                                link: "/fundamental",
+                            },
+                        ].map((item) => (
+                            <Link
+                                href={item.link}
+                                color="inherit"
+                                underline="none"
+                                key={item.text}
+                                sx={{ padding: 0 }}
+                            >
+                                <ListItem button>
+                                    <ListItemIcon>{item.icon}</ListItemIcon>
+                                    <ListItemText primary={item.text} />
+                                </ListItem>
+                            </Link>
+                        ))}
+                    </List>
+                    <Divider />
+                    <List>
+                        {[
+                            {
+                                text: "About",
+                                icon: <Info />,
+                                link: "/about",
+                            },
+                        ].map((item) => (
+                            <Link
+                                href={item.link}
+                                color="inherit"
+                                underline="none"
+                                key={item.text}
+                                sx={{ padding: 0 }}
+                            >
+                                <ListItem button>
+                                    <ListItemIcon>{item.icon}</ListItemIcon>
+                                    <ListItemText primary={item.text} />
+                                </ListItem>
+                            </Link>
+                        ))}
+                    </List>
+                </Drawer>
+                <Main open={user && open}>
+                    <DrawerHeader />
+                    {user ?
+                        <div
+                            style={{
+                                height: "calc(100vh - 64px - 40px)",
+                                overflow: "hidden",
+                            }}
+                        >
+                            <Routes>
+                                <Route
+                                    path="/"
+                                    element={<MarketOverview theme={colorTheme} />}
+                                />
+                                <Route
+                                    path="/ticker/:ticker"
+                                    element={<TickerGraph theme={colorTheme} />}
+                                />
+                                <Route
+                                    path="/watchlists"
+                                    element={<Watchlists />}
+                                />
+                                <Route
+                                    path="/heatmap"
+                                    element={
+                                        <Heatmap
+                                            selectedIndex={selectedIndex}
+                                            heatmapPortfolios={heatmapPortfolios}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/comparisons"
+                                    element={<Comparisons />}
+                                />
+                                <Route path="/crypto" element={<Crypto />} />
+                                <Route
+                                    path="/technical"
+                                    element={
+                                        <TechnicalAnalysis theme={colorTheme} />
+                                    }
+                                />
+                                <Route
+                                    path="/technical_screener"
+                                    element={<TechnicalScreener />}
+                                />
+                                <Route
+                                    path="/fundamental"
+                                    element={
+                                        <FundamentalAnalysis theme={colorTheme} />
+                                    }
+                                />
+                                <Route path="/about" element={<About />} />
+                            </Routes>
+                        </div>
+                        :
+                        <Routes>
+                            <Route path="*"
+                                element={<Navigate to="/login" />}
+                            >
+
+                            </Route>
+                            <Route
+                                path="/login"
+                                element={<Login />}
+                            />
+                            <Route
+                                path="/register"
+                                element={<Register />}
+                            />
+                        </Routes>
+                    }
+                </Main>
             </Router>
         </Box>
     );
