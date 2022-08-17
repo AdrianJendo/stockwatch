@@ -9,9 +9,12 @@ import pandas as pd
 tiingo_url = os.environ.get("tiingo_url")
 api_key = os.environ.get("tiingo_key")
 
+from decorators.token_required import token_required
+
 # /ticker/:ticker
 class RESTPriceHistory(Resource):
-    def get(self, ticker):
+    @token_required
+    def get(user, ticker):
         interval = request.args.get("interval", None)
 
         if ticker == None or interval == None:

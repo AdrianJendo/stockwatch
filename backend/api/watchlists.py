@@ -1,3 +1,4 @@
+from lib2to3.pgen2 import token
 from flask import jsonify, request
 from flask_restful import Resource
 import requests
@@ -7,9 +8,13 @@ import os
 alpha_url = os.environ.get("alpha_vantage_url")
 alpha_key = os.environ.get("alpha_vantage_key")
 
+from decorators.token_required import token_required
+
+
 # /watchlists/columns
 class RESTWatchlistColumns(Resource):
-    def get(self):
+    @token_required
+    def get(user):
         tickers = json.loads(request.args.get("tickers", "null"))
         api_fields = json.loads(request.args.get("lookup_fields", "null"))
         time_periods = json.loads(request.args.get("time_periods", "null"))

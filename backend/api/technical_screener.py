@@ -11,9 +11,13 @@ from app import postgres_db
 
 wiki_search_url = "https://www.slickcharts.com/sp500"
 
+from decorators.token_required import token_required
+
+
 # /technical_screener
 class RESTTechnicalScreener(Resource):
-    def get(self):
+    @token_required
+    def get(user):
         pattern = request.args.get("pattern", None)
 
         if pattern == None:

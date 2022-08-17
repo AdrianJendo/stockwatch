@@ -9,8 +9,11 @@ import pandas as pd
 tiingo_url = os.environ.get("tiingo_url")
 api_key = os.environ.get("tiingo_key")
 
+from decorators.token_required import token_required
+
 # /comparisons
 class RESTComparisons(Resource):
+    @token_required
     def get(user):
         # https://api.tiingo.com/tiingo/daily/<ticker>/prices?startDate=2012-1-1&endDate=2016-1-1
         # https://api.tiingo.com/tiingo/crypto/prices?tickers=btcusd,fldcbtc&startDate=2019-01-02&resampleFreq=5min

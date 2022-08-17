@@ -1,3 +1,4 @@
+from lib2to3.pgen2 import token
 from flask import request
 from flask_restful import Resource
 import requests
@@ -7,9 +8,12 @@ import numpy as np
 from bs4 import BeautifulSoup
 import json
 
+from decorators.token_required import token_required
+
 # /heatmap
 class RESTHeatmap(Resource):
-    def get(self):
+    @token_required
+    def get(user):
         index_name = request.args.get("index")
         supported_indices = ["sp500", "nasdaq100", "dowjones"]
 

@@ -12,9 +12,12 @@ tiingo_key = os.environ.get("tiingo_key")
 alpha_url = os.environ.get("alpha_vantage_url")
 alpha_key = os.environ.get("alpha_vantage_key")
 
+from decorators.token_required import token_required
+
 # /daily_prices
 class RESTDailyPrices(Resource):
-    def get(self):
+    @token_required
+    def get(user):
         tickers = json.loads(request.args.get("tickers", "null"))
 
         if not tickers:
