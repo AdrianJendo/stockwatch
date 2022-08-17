@@ -1,34 +1,45 @@
 from flask import request
 from flask_restful import Resource
+import os
 import json
-from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_bcrypt import check_password_hash
 from models.user import User
+import jwt
+from datetime import datetime, timezone, timedelta
 
-# /comparisons
+secret_key = os.environ.get("JWT_TOKEN") or "secretKey"
+
+# /login
 class RESTLogin(Resource):
-    def post(self):
+    def post():
         data = json.loads(request.data)
-        if "username" not in data or "password" not in data or "email" not in data:
+        if "password" not in data or "email" not in data:
             return {"error": "field missing"}
-        elif (
-            data["username"] == None
-            or data["password"] == None
-            or data["email"] == None
-        ):
+        elif data["password"] == None or data["email"] == None:
             return {"error": "required field is null"}
-        print(data["username"])
-        pw_hash = generate_password_hash("secret", 10)
-        print(check_password_hash(pw_hash, "seCret"))
-
-        new_user = User(
-            email=data["email"],
-            username=data["username"],
-            password=data["password"],
-        )
 
         try:
-            new_user.save()
+            user = User.objects.get(email=data["email"])
         except:
-            return {"error": "Failed saving user"}
+            return {"error": "user does not exist"}
 
-        return {"status": 200, "error": None}
+        try:
+            user.last_login = datetime.utcnow()
+            user.save()
+        except:
+            return {"error": "failed to authenticate user"}
+
+        if check_password_hash(user.password, data["password"]):
+            token = jwt.encode(
+                {
+                    "user_id": str(user.id),
+                    "user_email": user.email,
+                    "exp": datetime.now(tz=timezone.utc) + timedelta(hours=24),
+                },
+                secret_key,
+                algorithm="HS256",
+            )
+
+            return {"status": 200, "error": None, "token": token}
+
+        return {"error": "password does not match"}

@@ -11,7 +11,7 @@ api_key = os.environ.get("tiingo_key")
 
 # /comparisons
 class RESTComparisons(Resource):
-    def get(self):
+    def get(user):
         # https://api.tiingo.com/tiingo/daily/<ticker>/prices?startDate=2012-1-1&endDate=2016-1-1
         # https://api.tiingo.com/tiingo/crypto/prices?tickers=btcusd,fldcbtc&startDate=2019-01-02&resampleFreq=5min
         items = json.loads(request.args.get("items"))

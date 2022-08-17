@@ -32,6 +32,7 @@ from api import (
     technical_screener,
     daily_prices,
     register,
+    login,
 )
 
 # Routes
@@ -63,6 +64,7 @@ api.add_resource(daily_prices.RESTDailyPrices, "/daily_prices")
 
 # auth
 api.add_resource(register.RESTRegister, "/register")
+api.add_resource(login.RESTLogin, "/login")
 
 # Register Routes
 app.register_blueprint(api_bp, url_prefix="/api")
