@@ -1,10 +1,10 @@
 from flask import request
 from flask_restful import Resource
 import json
-from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_bcrypt import generate_password_hash
 from models.user import User
 
-# /comparisons
+# /register
 class RESTRegister(Resource):
     def post(self):
         data = json.loads(request.data)
@@ -16,14 +16,13 @@ class RESTRegister(Resource):
             or data["email"] == None
         ):
             return {"error": "required field is null"}
-        print(data["username"])
-        pw_hash = generate_password_hash("secret", 10)
-        print(check_password_hash(pw_hash, "seCret"))
+
+        pw_hash = generate_password_hash(data["password"], 10)
 
         new_user = User(
             email=data["email"],
             username=data["username"],
-            password=data["password"],
+            password=pw_hash,
         )
 
         try:
