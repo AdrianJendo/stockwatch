@@ -61,7 +61,6 @@ import Register from "components/auth/register";
 import axios from "axios";
 
 import Cookies from "universal-cookie";
-import { useEffect } from "react";
 const cookies = new Cookies();
 
 const drawerWidth = 230;
@@ -129,6 +128,11 @@ export default function PersistentDrawerLeft(props) {
 
     const toggleSwitch = () => {
         setDark(!dark);
+    };
+
+    const handleLogout = () => {
+        cookies.remove("AUTH_TOKEN");
+        window.location.href = "/login";
     };
 
     const uploadPortfolio = (e) => {
@@ -265,15 +269,12 @@ export default function PersistentDrawerLeft(props) {
                             )}
                         </div>
                         {/* <MUISwitch defaultChecked toggleSwitch={toggleSwitch} /> */}
-                        {token ? (
-                            <Button variant="contained">
+                        {token && (
+                            <Button
+                                variant="contained"
+                                onClick={() => handleLogout()}
+                            >
                                 Logout
-                                <input type="file" hidden />
-                            </Button>
-                        ) : (
-                            <Button variant="contained">
-                                Login
-                                <input type="file" hidden />
                             </Button>
                         )}
                     </Toolbar>
