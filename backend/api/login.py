@@ -11,7 +11,7 @@ secret_key = os.environ.get("JWT_TOKEN") or "secretKey"
 
 # /login
 class RESTLogin(Resource):
-    def post():
+    def post(self):
         data = json.loads(request.data)
         if "password" not in data or "email" not in data:
             return {"error": "field missing"}
@@ -29,6 +29,7 @@ class RESTLogin(Resource):
         except:
             return {"error": "failed to authenticate user"}
 
+        print(user.password, data["password"])
         if check_password_hash(user.password, data["password"]):
             token = jwt.encode(
                 {

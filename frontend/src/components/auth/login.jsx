@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { TextField, Button, Typography, Paper, Link } from "@mui/material";
 import { styled } from "@mui/system";
+import { useNavigate } from "react-router-dom";
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     marginTop: "30px",
@@ -10,8 +11,26 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [username, setUsername] = useState("");
-    const [login, setLogin] = useState("");
+    const navigate = useNavigate();
+
+    const handleLogin = () => {
+        const params = {};
+        params["email"] = email;
+        params["password"] = password;
+        axios.post("/api/login", params).then((resp) => {
+            if (resp.data.error) {
+                alert(resp.data.error);
+            } else {
+                console.log("SUCCESS");
+                console.log(resp.data);
+                alert("Login Successful");
+
+                // HANDLE JWT
+
+                navigate("/");
+            }
+        });
+    };
 
     return (
         <div style={{ textAlign: "center" }}>
@@ -27,19 +46,17 @@ const Login = () => {
             >
                 <Typography variant="h4">Log In</Typography>
                 <StyledTextField
-                    id="standard-basic"
                     label="Email"
                     variant="standard"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                 />
                 <StyledTextField
-                    id="standard-basic"
-                    label="Username"
-                    variant="standard"
-                />
-                <StyledTextField
-                    id="standard-basic"
                     label="Password"
                     variant="standard"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    type="password"
                 />
                 <Button
                     type="button"
@@ -49,6 +66,7 @@ const Login = () => {
                         marginTop: "30px",
                         marginBottom: "30px",
                     }}
+                    onClick={() => handleLogin()}
                 >
                     Log in
                 </Button>
