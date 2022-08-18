@@ -3,6 +3,9 @@ import axios from "axios";
 import { TextField, Button, Typography, Paper, Link } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     marginTop: "30px",
@@ -26,8 +29,11 @@ const Login = () => {
                 alert("Login Successful");
 
                 // HANDLE JWT
+                cookies.set("AUTH_TOKEN", resp.data.token, {
+                    path: "/",
+                });
 
-                navigate("/");
+                window.location.href = "/";
             }
         });
     };

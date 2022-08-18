@@ -58,6 +58,12 @@ import Crypto from "components/crypto/crypto";
 import Login from "components/auth/login";
 import Register from "components/auth/register";
 
+import axios from "axios";
+
+import Cookies from "universal-cookie";
+import { useEffect } from "react";
+const cookies = new Cookies();
+
 const drawerWidth = 230;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -113,7 +119,9 @@ export default function PersistentDrawerLeft(props) {
     const [open, setOpen] = useState(true);
     const [selectedIndex, setSelectedIndex] = useState("sp500");
     const [heatmapPortfolios, setHeatmapPortfolios] = useState({});
-    const [user, setUser] = useState(null);
+    const token = cookies.get("AUTH_TOKEN");
+
+    axios.defaults.headers.common["Authorization"] = token;
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -181,7 +189,7 @@ export default function PersistentDrawerLeft(props) {
             }}
         >
             <Router>
-                <StyledAppBar position="fixed" open={user && open}>
+                <StyledAppBar position="fixed" open={token && open}>
                     <Toolbar>
                         <IconButton
                             color="inherit"
@@ -203,8 +211,8 @@ export default function PersistentDrawerLeft(props) {
                                     Stock Watch
                                 </Typography>
                             </Link>
-                            {user && <TickerSearch />}
-                            {user && window.location.href.includes("heatmap") && (
+                            {token && <TickerSearch />}
+                            {token && window.location.href.includes("heatmap") && (
                                 <div
                                     style={{
                                         display: "flex",
@@ -257,7 +265,7 @@ export default function PersistentDrawerLeft(props) {
                             )}
                         </div>
                         {/* <MUISwitch defaultChecked toggleSwitch={toggleSwitch} /> */}
-                        {user ? (
+                        {token ? (
                             <Button variant="contained">
                                 Logout
                                 <input type="file" hidden />
@@ -281,7 +289,7 @@ export default function PersistentDrawerLeft(props) {
                     }}
                     variant="persistent"
                     anchor="left"
-                    open={user && open}
+                    open={token && open}
                 >
                     <DrawerHeader>
                         <IconButton onClick={toggleDrawer}>
@@ -391,9 +399,9 @@ export default function PersistentDrawerLeft(props) {
                         ))}
                     </List>
                 </Drawer>
-                <Main open={user && open}>
+                <Main open={token && open}>
                     <DrawerHeader />
-                    {user ? (
+                    {token ? (
                         <div
                             style={{
                                 height: "calc(100vh - 64px - 40px)",
@@ -402,11 +410,12 @@ export default function PersistentDrawerLeft(props) {
                         >
                             <Routes>
                                 <Route
-                                    path="/"
+                                    path="*"
                                     element={
                                         <MarketOverview theme={colorTheme} />
                                     }
                                 />
+
                                 <Route
                                     path="/ticker/:ticker"
                                     element={<TickerGraph theme={colorTheme} />}
@@ -457,7 +466,7 @@ export default function PersistentDrawerLeft(props) {
                             <Route
                                 path="*"
                                 element={<Navigate to="/login" />}
-                            ></Route>
+                            />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
                         </Routes>
